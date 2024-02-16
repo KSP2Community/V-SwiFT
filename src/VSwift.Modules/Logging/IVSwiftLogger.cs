@@ -4,7 +4,7 @@ public interface IVSwiftLogger
 {
 
 
-    public static IVSwiftLogger Instance { get; set; }
+    public static IVSwiftLogger Instance { get; set; } = null!;
 
     public void LogDebug(object debug);
 
