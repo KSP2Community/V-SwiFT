@@ -3,6 +3,8 @@ using BepInEx;
 using JetBrains.Annotations;
 using SpaceWarp;
 using SpaceWarp.API.Mods;
+using VSwift.Logging;
+using VSwift.Modules.Logging;
 
 namespace VSwift;
 
@@ -20,12 +22,14 @@ public class VSwiftPlugin : BaseSpaceWarpPlugin
 
     /// <summary>
     /// Runs on loading of the plugin, loads the VSwift.Modules assembly
+    /// VSwift.Modules is in a separate assembly such that it does not have to reference the main assembly
     /// </summary>
     public VSwiftPlugin()
     {
         var path = Assembly.GetExecutingAssembly().Location;
         var folder = new FileInfo(path).Directory;
         Assembly.LoadFile($"{folder}\\VSwift.Modules.dll");
+        IVSwiftLogger.Instance = new VSwiftBepInExLogger(Logger);
     }
     
     /// <summary>
