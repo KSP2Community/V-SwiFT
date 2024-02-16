@@ -6,7 +6,7 @@
   "description": "Variant Switching & Feature Tweaking, a part switch mod for KSP2",
   "source": "https://github.com/KSP2Community/V-SwiFT",
   "version": "0.0.1",
-  "version_check": "https://github.com/KSP2Community/V-SwiFT/main/plugin_template/swinfo.json",
+  "version_check": "https://raw.githubusercontent.com/KSP2Community/V-SwiFT/main/plugin_template/swinfo.json",
   "ksp2_version": {
     "min": "0.2.0",
     "max": "*"
