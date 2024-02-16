@@ -1,3 +1,4 @@
+using System.Reflection;
 using BepInEx;
 using JetBrains.Annotations;
 using SpaceWarp;
@@ -17,6 +18,16 @@ public class VSwiftPlugin : BaseSpaceWarpPlugin
     // Singleton instance of the plugin class
     [PublicAPI] public static VSwiftPlugin Instance { get; set; }
 
+    /// <summary>
+    /// Runs on loading of the plugin, loads the VSwift.Modules assembly
+    /// </summary>
+    public VSwiftPlugin()
+    {
+        var path = Assembly.GetExecutingAssembly().Location;
+        var folder = new FileInfo(path).Directory;
+        Assembly.LoadFile($"{folder}\\VSwift.Modules.dll");
+    }
+    
     /// <summary>
     /// Runs when the mod is first initialized.
     /// </summary>
