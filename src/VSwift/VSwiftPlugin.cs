@@ -1,6 +1,7 @@
 using System.Reflection;
 using BepInEx;
 using JetBrains.Annotations;
+using PatchManager;
 using SpaceWarp;
 using SpaceWarp.API.Mods;
 using VSwift.Logging;
@@ -10,6 +11,7 @@ namespace VSwift;
 
 [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
 [BepInDependency(SpaceWarpPlugin.ModGuid, SpaceWarpPlugin.ModVer)]
+[BepInDependency(PatchManagerPlugin.ModGuid, PatchManagerPlugin.ModVer)]
 public class VSwiftPlugin : BaseSpaceWarpPlugin
 {
     // Useful in case some other mod wants to use this mod a dependency
