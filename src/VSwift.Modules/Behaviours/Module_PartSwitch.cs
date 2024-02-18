@@ -6,6 +6,7 @@ using UnityEngine;
 using VSwift.Modules.Components;
 using VSwift.Modules.Data;
 using VSwift.Modules.Logging;
+using VSwift.Modules.Transformers;
 using VSwift.Modules.Variants;
 
 namespace VSwift.Modules.Behaviours;
@@ -15,7 +16,8 @@ public class Module_PartSwitch : PartBehaviourModule
 {
     private class StoredState
     {
-        public List<(GameObject gameObject, bool state)> OriginalTransforms = [];
+        // public readonly List<(GameObject gameObject, bool state)> OriginalTransforms = [];
+        public readonly Dictionary<Type, (ITransformer instance, object data)> OriginalTransformerData = [];
     }
     
     public override Type PartComponentModuleType => typeof(PartComponentModule_PartSwitch);
@@ -112,6 +114,10 @@ public class Module_PartSwitch : PartBehaviourModule
         var i = 0;
         foreach (var variantSet in _dataPartSwitch!.VariantSets)
         {
+            if (_dataPartSwitch.ActiveVariants.Count <= i)
+            {
+                _dataPartSwitch.ActiveVariants.Add(variantSet.Variants.First().VariantId);
+            }
             ApplyVariantCommon(variantSet.Variants.First(variant =>
                 _dataPartSwitch.ActiveVariants[i] == variant.VariantId));
             i++;
@@ -120,16 +126,11 @@ public class Module_PartSwitch : PartBehaviourModule
     
     private void ApplyVariantCommon(Variant variant)
     {
-        foreach (var activatedTransform in variant.Transforms)
+        foreach (var transformer in variant.Transformers)
         {
-            var t = gameObject.transform.FindChildRecursive(activatedTransform);
-            if (ReferenceEquals(t,null) || t == null)
-            {
-                IVSwiftLogger.Instance.LogError($"Could not find child of {name} with name {activatedTransform}");
-                continue;
-            }
-            t.gameObject.SetActive(true);
+            transformer.ApplyCommon(this);
         }
+        
     }
     private void ApplyInFlight()
     {
@@ -144,25 +145,23 @@ public class Module_PartSwitch : PartBehaviourModule
     }
 
     private void ResetToOriginalState() {
-        foreach (var (go, state) in _storedState!.OriginalTransforms)
+        foreach (var (key, (instance, data)) in _storedState!.OriginalTransformerData)
         {
-            go.SetActive(state);
+            instance.ResetToOriginalState(this, data);
         }
     }
 
     private void StoreOriginalState()
     {
         _storedState = new StoredState();
-        RecursivelyStoreChildren(gameObject);
-    }
-
-    private void RecursivelyStoreChildren(GameObject go)
-    {
-        foreach (Transform child in go.transform)
+        foreach (var transformer in from variantSet in _dataPartSwitch!.VariantSets
+                 from variant in variantSet.Variants
+                 from transformer in variant.Transformers
+                 where !_storedState.OriginalTransformerData.ContainsKey(transformer.GetType())
+                 select transformer)
         {
-            var o = child.gameObject;
-            _storedState!.OriginalTransforms.Add((o, o.activeSelf));
-            RecursivelyStoreChildren(child.gameObject);
+            _storedState.OriginalTransformerData[transformer.GetType()] =
+                (transformer, transformer.StoreOriginalState(this));
         }
     }
 }
