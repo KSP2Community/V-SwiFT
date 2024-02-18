@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using KSP.Game;
+using UnityEngine;
 using UnityEngine.AddressableAssets;
 using VSwift.Modules.Behaviours;
 using VSwift.Modules.Logging;
@@ -61,26 +62,30 @@ public class MaterialSwapper : ITransformer
         {
             if (!_material.TryGetValue(to, out var mat))
             {
-                mat = LoadMaterial(to);
-                _material[to] = mat;
+                LoadMaterial(to, m =>
+                {
+                    _material[to] = m;
+                    RecursivelySwitch(partSwitch.gameObject, from, m);
+                });
             }
-
-            RecursivelySwitch(partSwitch.gameObject, from, mat);
+            else
+            {
+                RecursivelySwitch(partSwitch.gameObject, from, mat);
+            }
         }
     }
 
-    private Material LoadMaterial(string name)
+    private void LoadMaterial(string name, Action<Material> callback)
     {
         if (name.StartsWith("addressables://"))
         {
             var addressableKey = name.Replace("addressables://", "");
-            var handle = Addressables.LoadAssetAsync<Material>(addressableKey);
-            var result =  handle.WaitForCompletion();
-            var clone = new Material(result);
-            // Addressables.Release(result);
-            return clone;
+            GameManager.Instance.Assets.Load(addressableKey, callback);
         }
-        throw new Exception($"Unknown material {name}");
+        else
+        {
+            throw new Exception($"Unknown material {name}");
+        }
     }
     
     private void RecursivelySwitch(GameObject gameObject, string name, Material targetMat)
