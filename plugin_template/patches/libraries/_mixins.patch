@@ -1,0 +1,19 @@
+@mixin ps-pam-override() {
+    PAMModuleVisualsOverride +: [
+        {
+            PartComponentModuleName: PartComponentModule_PartSwitch,
+            ModuleDisplayName: "VSwift/PartSwitch",
+            ShowHeader: true,
+            ShowFooter: false
+        }
+    ];
+}
+
+@mixin part-switch() {
+    +Module_PartSwitch {
+        +Data_PartSwitch {
+            @mixin-slot
+        }
+    }
+    @include ps-pam-override()
+}

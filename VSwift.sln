@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{DEEC0CDD-D14F-4753-BA48-E01099B12D73}") = "VSwift", "src/VSwift/VSwift.csproj", "{B047C83D-8AFE-4D2D-94A8-20D1A559BBC5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VSwift.Modules", "src\VSwift.Modules\VSwift.Modules.csproj", "{00FDF80C-F331-4655-B93D-0672C472A009}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,6 +20,14 @@ Global
 		{B047C83D-8AFE-4D2D-94A8-20D1A559BBC5}.Deploy|Any CPU.Build.0 = Deploy|Any CPU
 		{B047C83D-8AFE-4D2D-94A8-20D1A559BBC5}.DeployAndRun|Any CPU.ActiveCfg = DeployAndRun|Any CPU
 		{B047C83D-8AFE-4D2D-94A8-20D1A559BBC5}.DeployAndRun|Any CPU.Build.0 = DeployAndRun|Any CPU
+		{00FDF80C-F331-4655-B93D-0672C472A009}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00FDF80C-F331-4655-B93D-0672C472A009}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00FDF80C-F331-4655-B93D-0672C472A009}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00FDF80C-F331-4655-B93D-0672C472A009}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00FDF80C-F331-4655-B93D-0672C472A009}.Deploy|Any CPU.ActiveCfg = Deploy|Any CPU
+		{00FDF80C-F331-4655-B93D-0672C472A009}.Deploy|Any CPU.Build.0 = Deploy|Any CPU
+		{00FDF80C-F331-4655-B93D-0672C472A009}.DeployAndRun|Any CPU.ActiveCfg = DeployAndRun|Any CPU
+		{00FDF80C-F331-4655-B93D-0672C472A009}.DeployAndRun|Any CPU.Build.0 = DeployAndRun|Any CPU
 	EndGlobalSection
 EndGlobal
 
