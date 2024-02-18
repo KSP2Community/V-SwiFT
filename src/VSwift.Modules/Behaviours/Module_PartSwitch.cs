@@ -1,5 +1,6 @@
 ﻿using Castle.Core.Internal;
 using I2.Loc;
+using KSP.Game;
 using KSP.Sim.Definitions;
 using KSP.UI.Binding;
 using UnityEngine;
@@ -95,6 +96,7 @@ public class Module_PartSwitch : PartBehaviourModule
             var list = new DropdownItemList();
             foreach (var variant in variantSet.Variants)
             {
+                if (!AreAllTechsUnlocked(variant.VariantTechs)) continue;
                 list.Add(variant.VariantId, new DropdownItem
                 {
                     key = variant.VariantId,
@@ -163,5 +165,12 @@ public class Module_PartSwitch : PartBehaviourModule
             _storedState.OriginalTransformerData[transformer.GetType()] =
                 (transformer, transformer.StoreOriginalState(this));
         }
+    }
+
+    private static bool AreAllTechsUnlocked(List<string> techs)
+    {
+        if (!GameManager.Instance.GameModeManager.IsGameModeFeatureEnabled("SciencePoints")) return true;
+        var scienceManager = GameManager.Instance.Game.ScienceManager;
+        return techs.All(tech => scienceManager.IsNodeUnlocked(tech));
     }
 }
