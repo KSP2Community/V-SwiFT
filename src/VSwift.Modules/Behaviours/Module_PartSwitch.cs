@@ -38,78 +38,87 @@ public class Module_PartSwitch : PartBehaviourModule
     public override void OnInitialize()
     {
         base.OnInitialize();
-        IVSwiftLogger.Instance.LogInfo("Initializing!!!!");   
         if (PartBackingMode == PartBackingModes.Flight)
+            HandleInFlightInitialization();
+        else
+            HandleInOabInitialization();
+    }
+
+    private void HandleInOabInitialization()
+    {
+        var j = _dataPartSwitch!.VariantSets.Aggregate(0, HandleVariantSetInOab);
+        ApplyInOab();
+    }
+
+    private int HandleVariantSetInOab(int j, VariantSet variantSet)
+    {
+        if (_dataPartSwitch!.ActiveVariants.Count <= j)
         {
-            var i = 0;
-            foreach (var variant in _dataPartSwitch!.VariantSets)
-            {
-                if (_dataPartSwitch!.ActiveVariants.Count <= i)
-                {
-                    _dataPartSwitch.ActiveVariants.Add(variant.Variants.First().VariantId);
-                }
-
-                if (variant.Variants.All(v => _dataPartSwitch.ActiveVariants[i] != v.VariantId))
-                {
-                    _dataPartSwitch.ActiveVariants[i] = variant.Variants.First().VariantId;
-                }
-                i += 1;
-            }
-            ApplyInFlight();
-            return;
+            _dataPartSwitch.ActiveVariants.Add(variantSet.Variants.First().VariantId);
         }
-        var j = 0;
-        foreach (var variantSet in _dataPartSwitch!.VariantSets)
+
+        if (variantSet.Variants.All(v => _dataPartSwitch.ActiveVariants[j] != v.VariantId))
         {
-            if (_dataPartSwitch!.ActiveVariants.Count <= j)
-            {
-                _dataPartSwitch.ActiveVariants.Add(variantSet.Variants.First().VariantId);
-            }
-
-            if (variantSet.Variants.All(v => _dataPartSwitch.ActiveVariants[j] != v.VariantId))
-            {
-                _dataPartSwitch.ActiveVariants[j] = variantSet.Variants.First().VariantId;
-            }
-
-            var variantSetDropdown = new ModuleProperty<string>(_dataPartSwitch.ActiveVariants[j])
-            {
-                ContextKey = variantSet.VariantSetId
-            };
-            _dataPartSwitch.AddProperty(
-                LocalizationManager.GetTranslation(variantSet.VariantSetLocalizationKey.IsNullOrEmpty() ? variantSet.VariantSetId : variantSet.VariantSetLocalizationKey),
-                    variantSetDropdown
-                );
-            var j1 = j;
-            variantSetDropdown.SetValue(_dataPartSwitch.ActiveVariants[j]);
-            variantSetDropdown.OnChangedValue += newVariant =>
-            {
-                IVSwiftLogger.Instance.LogInfo($"{OABPart.Name} switched variant to {newVariant}");
-                try
-                {
-                    _dataPartSwitch.ActiveVariants[j1] = newVariant;
-                    ApplyInOab();
-                }
-                catch (Exception e)
-                {
-                    IVSwiftLogger.Instance.LogError(e);
-                }
-            };
-            var list = new DropdownItemList();
-            foreach (var variant in variantSet.Variants)
-            {
-                if (!AreAllTechsUnlocked(variant.VariantTechs)) continue;
-                list.Add(variant.VariantId, new DropdownItem
-                {
-                    key = variant.VariantId,
-                    text = LocalizationManager.GetTranslation(variant.VariantLocalizationKey.IsNullOrEmpty()
-                        ? variant.VariantId
-                        : variant.VariantLocalizationKey)
-                });
-            }
-            _dataPartSwitch.SetDropdownData(variantSetDropdown,list);
-            j += 1;
-            ApplyInOab();
+            _dataPartSwitch.ActiveVariants[j] = variantSet.Variants.First().VariantId;
         }
+
+        var variantSetDropdown = new ModuleProperty<string>(_dataPartSwitch.ActiveVariants[j])
+        {
+            ContextKey = variantSet.VariantSetId
+        };
+        _dataPartSwitch.AddProperty(
+            LocalizationManager.GetTranslation(variantSet.VariantSetLocalizationKey.IsNullOrEmpty() ? variantSet.VariantSetId : variantSet.VariantSetLocalizationKey),
+            variantSetDropdown
+        );
+        var j1 = j;
+        variantSetDropdown.SetValue(_dataPartSwitch.ActiveVariants[j]);
+        variantSetDropdown.OnChangedValue += newVariant =>
+        {
+            IVSwiftLogger.Instance.LogInfo($"{OABPart.Name} switched variant to {newVariant}");
+            try
+            {
+                _dataPartSwitch.ActiveVariants[j1] = newVariant;
+                ApplyInOab();
+            }
+            catch (Exception e)
+            {
+                IVSwiftLogger.Instance.LogError(e);
+            }
+        };
+        var list = new DropdownItemList();
+        foreach (var variant in variantSet.Variants)
+        {
+            if (!AreAllTechsUnlocked(variant.VariantTechs)) continue;
+            list.Add(variant.VariantId, new DropdownItem
+            {
+                key = variant.VariantId,
+                text = LocalizationManager.GetTranslation(variant.VariantLocalizationKey.IsNullOrEmpty()
+                    ? variant.VariantId
+                    : variant.VariantLocalizationKey)
+            });
+        }
+        _dataPartSwitch.SetDropdownData(variantSetDropdown,list);
+        j += 1;
+        return j;
+    }
+
+    private void HandleInFlightInitialization()
+    {
+        var i = 0;
+        foreach (var variant in _dataPartSwitch!.VariantSets)
+        {
+            if (_dataPartSwitch!.ActiveVariants.Count <= i)
+            {
+                _dataPartSwitch.ActiveVariants.Add(variant.Variants.First().VariantId);
+            }
+
+            if (variant.Variants.All(v => _dataPartSwitch.ActiveVariants[i] != v.VariantId))
+            {
+                _dataPartSwitch.ActiveVariants[i] = variant.Variants.First().VariantId;
+            }
+            i += 1;
+        }
+        ApplyInFlight();
     }
 
     private void ApplyCommon()
