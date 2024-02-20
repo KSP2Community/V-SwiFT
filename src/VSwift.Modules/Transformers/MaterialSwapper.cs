@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using VSwift.Modules.Behaviours;
 using VSwift.Modules.Logging;
+using VSwift.Modules.Reverters;
 
 namespace VSwift.Modules.Transformers;
 
@@ -11,39 +12,10 @@ public class MaterialSwapper : ITransformer
 {
     public Dictionary<string, string> Swaps = [];
     private Dictionary<string,Material> _material = [];
-    
-    public object StoreOriginalState(Module_PartSwitch partSwitchModule)
-    {
-        Dictionary<Renderer, List<Material>> dict = new();
-        RecursivelyStoreState(partSwitchModule.gameObject, dict);
-        return dict;
-    }
-    
-    private static void RecursivelyStoreState(GameObject gameObject, Dictionary<Renderer, List<Material>> state)
-    {
-        var renderers = gameObject.GetComponents<Renderer>();
-        foreach (var renderer in renderers)
-        {
-            state[renderer] = renderer.materials.Select(mat => new Material(mat)).ToList();
-        }
-        foreach (Transform child in gameObject.transform)
-        {
-            var o = child.gameObject;
-            RecursivelyStoreState(o, state);
-        }
-    }
 
-    public void ResetToOriginalState(Module_PartSwitch partSwitchModule, object originalState)
-    {
-        var dict = originalState as Dictionary<Renderer, List<Material>>;
-        foreach (var (renderer, mats) in dict!)
-        {
-            for (var i = 0; i < renderer.materials.Length; i++)
-            {
-                renderer.materials[i].CopyPropertiesFromMaterial(mats[i]);
-            }
-        }
-    }
+
+    public IReverter Reverter => MaterialReverter.Instance;
+    public bool SavesInformation => false;
 
     public void ApplyInFlight(Module_PartSwitch partSwitch)
     {
