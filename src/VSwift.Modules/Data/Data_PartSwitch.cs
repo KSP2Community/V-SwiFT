@@ -3,6 +3,7 @@ using I2.Loc;
 using KSP.Game;
 using KSP.Sim;
 using KSP.Sim.Definitions;
+using Newtonsoft.Json.Linq;
 using UnityEngine.Serialization;
 using VSwift.Modules.Behaviours;
 using VSwift.Modules.Variants;
@@ -61,4 +62,37 @@ public class Data_PartSwitch : ModuleData
                     new OABPartData.PartInfoModuleSubEntry(LocalizationManager.GetTranslation(GameManager.Instance.Game
                         .ScienceManager.TechNodeDataStore.AvailableData[tech]?.NameLocKey ?? ""))).ToList()
             );
+    public Dictionary<string, Dictionary<string, (string savedType, JToken savedValue)>>? GetStoredVariantInformation()
+    {
+        var i = 0;
+        var anyStored = false;
+        Dictionary<string, Dictionary<string, (string savedType, JToken savedValue)>> result = [];
+        foreach (var variantSet in VariantSets)
+        {
+            var currentSet = result[variantSet.VariantSetId] = [];
+            if (ActiveVariants.Count <= i)
+            {
+                ActiveVariants.Add(variantSet.Variants.First().VariantId);
+            }
+
+            if (variantSet.Variants.All(variant => ActiveVariants[i] != variant.VariantId))
+            {
+                ActiveVariants[i] = variantSet.Variants.First().VariantId;
+            }
+            var variant = variantSet.Variants.First(variant =>
+                ActiveVariants[i] == variant.VariantId);
+            foreach (var transformer in variant.Transformers)
+            {
+                if (!transformer.SavesInformation) continue;
+                anyStored = true;
+                var savedInformation = transformer.SaveInformation();
+                currentSet[transformer.GetType().FullName!] =
+                    (savedInformation.savedType.AssemblyQualifiedName, savedInformation.savedValue);
+
+            }
+            i += 1;
+        }
+
+        return anyStored ? result : null; // Just make it easier when deserializing
+    }
 }

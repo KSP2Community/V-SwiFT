@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using VSwift.Modules.Behaviours;
 using VSwift.Modules.Logging;
+using VSwift.Modules.Reverters;
 
 namespace VSwift.Modules.Transformers;
 
@@ -8,31 +9,9 @@ namespace VSwift.Modules.Transformers;
 public class TransformActivator : ITransformer
 {
     public List<string> Transforms = [];
-    public object StoreOriginalState(Module_PartSwitch partSwitchModule)
-    {
-        var dict = new Dictionary<GameObject, bool>();
-        RecursivelyStoreState(partSwitchModule.gameObject, dict);
-        return dict;
-    }
-
-    private static void RecursivelyStoreState(GameObject gameObject, Dictionary<GameObject, bool> state)
-    {
-        foreach (Transform child in gameObject.transform)
-        {
-            var o = child.gameObject;
-            state[o] = o.activeSelf;
-            RecursivelyStoreState(o, state);
-        }
-    }
-
-    public void ResetToOriginalState(Module_PartSwitch partSwitchModule, object originalState)
-    {
-        var dict = originalState as Dictionary<GameObject, bool>;
-        foreach (var (obj, state) in dict!)
-        {
-            obj.SetActive(state);
-        }
-    }
+    
+    public IReverter Reverter => TransformReverter.Instance;
+    public bool SavesInformation => false;
 
     public void ApplyInFlight(Module_PartSwitch partSwitch)
     {

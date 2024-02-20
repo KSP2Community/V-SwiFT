@@ -1,5 +1,6 @@
 using System.Reflection;
 using BepInEx;
+using HarmonyLib;
 using JetBrains.Annotations;
 using PatchManager;
 using SpaceWarp;
@@ -21,6 +22,11 @@ public class VSwiftPlugin : BaseSpaceWarpPlugin
 
     // Singleton instance of the plugin class
     [PublicAPI] public static VSwiftPlugin Instance { get; set; }
+
+    private void Awake()
+    {
+        Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
+    }
 
     /// <summary>
     /// Runs on loading of the plugin, loads the VSwift.Modules assembly

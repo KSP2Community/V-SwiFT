@@ -4,6 +4,8 @@ Project("{DEEC0CDD-D14F-4753-BA48-E01099B12D73}") = "VSwift", "src/VSwift/VSwift
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VSwift.Modules", "src\VSwift.Modules\VSwift.Modules.csproj", "{00FDF80C-F331-4655-B93D-0672C472A009}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VSwift.Preload", "src\VSwift.Preload\VSwift.Preload.csproj", "{B62A47FF-849E-4AA2-9526-93B2CAE3E353}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -28,6 +30,14 @@ Global
 		{00FDF80C-F331-4655-B93D-0672C472A009}.Deploy|Any CPU.Build.0 = Deploy|Any CPU
 		{00FDF80C-F331-4655-B93D-0672C472A009}.DeployAndRun|Any CPU.ActiveCfg = DeployAndRun|Any CPU
 		{00FDF80C-F331-4655-B93D-0672C472A009}.DeployAndRun|Any CPU.Build.0 = DeployAndRun|Any CPU
+		{B62A47FF-849E-4AA2-9526-93B2CAE3E353}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B62A47FF-849E-4AA2-9526-93B2CAE3E353}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B62A47FF-849E-4AA2-9526-93B2CAE3E353}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B62A47FF-849E-4AA2-9526-93B2CAE3E353}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B62A47FF-849E-4AA2-9526-93B2CAE3E353}.Deploy|Any CPU.ActiveCfg = Deploy|Any CPU
+		{B62A47FF-849E-4AA2-9526-93B2CAE3E353}.Deploy|Any CPU.Build.0 = Deploy|Any CPU
+		{B62A47FF-849E-4AA2-9526-93B2CAE3E353}.DeployAndRun|Any CPU.ActiveCfg = DeployAndRun|Any CPU
+		{B62A47FF-849E-4AA2-9526-93B2CAE3E353}.DeployAndRun|Any CPU.Build.0 = DeployAndRun|Any CPU
 	EndGlobalSection
 EndGlobal
 
