@@ -69,7 +69,7 @@ public class Data_PartSwitch : ModuleData
         Dictionary<string, Dictionary<string, (string savedType, JToken savedValue)>> result = [];
         foreach (var variantSet in VariantSets)
         {
-            var currentSet = result[variantSet.VariantSetId] = [];
+            var currentSet = result[$"{i}"] = [];
             if (ActiveVariants.Count <= i)
             {
                 ActiveVariants.Add(variantSet.Variants.First().VariantId);
@@ -81,14 +81,13 @@ public class Data_PartSwitch : ModuleData
             }
             var variant = variantSet.Variants.First(variant =>
                 ActiveVariants[i] == variant.VariantId);
-            foreach (var transformer in variant.Transformers)
+            var j = 0;
+            foreach (var transformer in variant.Transformers.Where(transformer => transformer.SavesInformation))
             {
-                if (!transformer.SavesInformation) continue;
                 anyStored = true;
                 var savedInformation = transformer.SaveInformation();
-                currentSet[transformer.GetType().FullName!] =
+                currentSet[$"{j++}"] =
                     (savedInformation.savedType.AssemblyQualifiedName, savedInformation.savedValue);
-
             }
             i += 1;
         }

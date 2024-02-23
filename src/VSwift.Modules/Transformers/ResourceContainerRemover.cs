@@ -14,8 +14,10 @@ namespace VSwift.Modules.Transformers;
 public class ResourceContainerRemover : ITransformer
 {
     public List<string> Containers = [];
-    public IReverter Reverter => ResourceContainerReverter.Instance;
+    public IReverter? Reverter => ResourceContainerReverter.Instance;
     public bool SavesInformation => true;
+    public bool VisualizesInformation => false;
+
     public void ApplyInFlight(Module_PartSwitch partSwitch)
     {
     }

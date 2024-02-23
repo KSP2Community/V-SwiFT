@@ -6,7 +6,7 @@ namespace VSwift.Modules.Reverters;
 public class TransformReverter : IReverter
 {
     private static TransformReverter? _instance;
-    public static TransformReverter Instance => _instance ??= new TransformReverter();
+    public static TransformReverter? Instance => _instance ??= new TransformReverter();
     
     public object Store(Module_PartSwitch partSwitch)
     {

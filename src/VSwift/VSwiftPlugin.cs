@@ -1,5 +1,6 @@
 using System.Reflection;
 using BepInEx;
+using HarmonyLib;
 using JetBrains.Annotations;
 using SpaceWarp;
 using SpaceWarp.API.Assets;
@@ -11,6 +12,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using VSwift.Logging;
 using VSwift.Modules.Logging;
+using VSwift.Modules.UI;
 
 namespace VSwift;
 
@@ -41,6 +43,7 @@ public class VSwiftPlugin : BaseSpaceWarpPlugin
         var folder = new FileInfo(path).Directory;
         Assembly.LoadFile($"{folder}\\VSwift.Modules.dll");
         IVSwiftLogger.Instance = new VSwiftBepInExLogger(Logger);
+        IVSwiftUI.Instance = new VSwiftUI();
     }
     
     /// <summary>
@@ -50,71 +53,33 @@ public class VSwiftPlugin : BaseSpaceWarpPlugin
     {
         base.OnInitialized();
 
+        Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
         Instance = this;
 
         // Load all the other assemblies used by this mod
         LoadAssemblies();
 
-        // Load the UI from the asset bundle
-        var myFirstWindowUxml = AssetManager.GetAsset<VisualTreeAsset>(
-            // The case-insensitive path to the asset in the bundle is composed of:
-            // - The mod GUID:
+        var partSwitchPopoutWindowControllerUxml = AssetManager.GetAsset<VisualTreeAsset>(
             $"{ModGuid}/" +
-            // - The name of the asset bundle:
             "VSwift_ui/" +
-            // - The path to the asset in your Unity project (without the "Assets/" part)
-            "ui/myfirstwindow/myfirstwindow.uxml"
+            "ui/partswitchpopout/partswitchpopout.uxml"
         );
 
-        // Create the window options object
         var windowOptions = new WindowOptions
         {
-            // The ID of the window. It should be unique to your mod.
-            WindowId = "VSwift_MyFirstWindow",
-            // The transform of parent game object of the window.
-            // If null, it will be created under the main canvas.
+            WindowId = "VSwift_PartSwitchPopout",
             Parent = null,
-            // Whether or not the window can be hidden with F2.
             IsHidingEnabled = true,
-            // Whether to disable game input when typing into text fields.
-            DisableGameInputForTextFields = true,
+            DisableGameInputForTextFields = false, // There will be no text fields
             MoveOptions = new MoveOptions
             {
-                // Whether or not the window can be moved by dragging.
                 IsMovingEnabled = true,
-                // Whether or not the window can only be moved within the screen bounds.
-                CheckScreenBounds = true
+                CheckScreenBounds = true,
             }
         };
 
-        // Create the window
-        var myFirstWindow = Window.Create(windowOptions, myFirstWindowUxml);
-        // Add a controller for the UI to the window's game object
-        var myFirstWindowController = myFirstWindow.gameObject.AddComponent<MyFirstWindowController>();
-
-        // Register Flight AppBar button
-        Appbar.RegisterAppButton(
-            ModName,
-            ToolbarFlightButtonID,
-            AssetManager.GetAsset<Texture2D>($"{ModGuid}/images/icon.png"),
-            isOpen => myFirstWindowController.IsWindowOpen = isOpen
-        );
-
-        // Register OAB AppBar Button
-        Appbar.RegisterOABAppButton(
-            ModName,
-            ToolbarOabButtonID,
-            AssetManager.GetAsset<Texture2D>($"{ModGuid}/images/icon.png"),
-            isOpen => myFirstWindowController.IsWindowOpen = isOpen
-        );
-
-        // Register KSC AppBar Button
-        Appbar.RegisterKSCAppButton(
-            ModName,
-            ToolbarKscButtonID,
-            AssetManager.GetAsset<Texture2D>($"{ModGuid}/images/icon.png"),
-            () => myFirstWindowController.IsWindowOpen = !myFirstWindowController.IsWindowOpen
-        );
+        var popOutWindow = Window.Create(windowOptions, partSwitchPopoutWindowControllerUxml);
+        var popoutWindowController = popOutWindow.gameObject.AddComponent<PartSwitchPopoutWindowController>();
     }
 
     /// <summary>

@@ -10,6 +10,7 @@ using VSwift.Modules.Data;
 using VSwift.Modules.Logging;
 using VSwift.Modules.Reverters;
 using VSwift.Modules.Transformers;
+using VSwift.Modules.UI;
 using VSwift.Modules.Variants;
 
 namespace VSwift.Modules.Behaviours;
@@ -22,12 +23,12 @@ public class Module_PartSwitch : PartBehaviourModule
         // public readonly List<(GameObject gameObject, bool state)> OriginalTransforms = [];
         public readonly Dictionary<IReverter, object> OriginalTransformerData = [];
     }
-    
+
     public override Type PartComponentModuleType => typeof(PartComponentModule_PartSwitch);
     private Data_PartSwitch? _dataPartSwitch;
     private StoredState? _storedState;
-    
-    
+    public Data_PartSwitch? DataPartSwitch => _dataPartSwitch;
+
     public override void AddDataModules()
     {
         base.AddDataModules();
@@ -62,22 +63,48 @@ public class Module_PartSwitch : PartBehaviourModule
             _dataPartSwitch.ActiveVariants[j] = variantSet.Variants.First().VariantId;
         }
 
-        var variantSetDropdown = new ModuleProperty<string>(_dataPartSwitch.ActiveVariants[j])
+        if (variantSet.IsPopout)
+        {
+            GenerateVariantSetButton(variantSet);
+        }
+        else
+        {
+            GenerateVariantSetDropdown(j, variantSet);
+        }
+
+        j += 1;
+        return j;
+    }
+
+    private void GenerateVariantSetButton(VariantSet variantSet)
+    {
+        var moduleAction = new ModuleAction(delegate() { IVSwiftUI.Instance.ShowUIFor(this, variantSet); });
+        DataPartSwitch!.AddAction(LocalizationManager.GetTranslation(
+                variantSet.VariantSetLocalizationKey.IsNullOrEmpty()
+                    ? variantSet.VariantSetId
+                    : variantSet.VariantSetLocalizationKey),
+            moduleAction);
+    }
+
+    private void GenerateVariantSetDropdown(int j, VariantSet variantSet)
+    {
+        var variantSetDropdown = new ModuleProperty<string>(_dataPartSwitch!.ActiveVariants[j])
         {
             ContextKey = variantSet.VariantSetId
         };
         _dataPartSwitch.AddProperty(
-            LocalizationManager.GetTranslation(variantSet.VariantSetLocalizationKey.IsNullOrEmpty() ? variantSet.VariantSetId : variantSet.VariantSetLocalizationKey),
+            LocalizationManager.GetTranslation(variantSet.VariantSetLocalizationKey.IsNullOrEmpty()
+                ? variantSet.VariantSetId
+                : variantSet.VariantSetLocalizationKey),
             variantSetDropdown
         );
-        var j1 = j;
         variantSetDropdown.SetValue(_dataPartSwitch.ActiveVariants[j]);
         variantSetDropdown.OnChangedValue += newVariant =>
         {
             IVSwiftLogger.Instance.LogInfo($"{OABPart.Name} switched variant to {newVariant}");
             try
             {
-                _dataPartSwitch.ActiveVariants[j1] = newVariant;
+                _dataPartSwitch.ActiveVariants[j] = newVariant;
                 ApplyInOab();
             }
             catch (Exception e)
@@ -97,9 +124,8 @@ public class Module_PartSwitch : PartBehaviourModule
                     : variant.VariantLocalizationKey)
             });
         }
-        _dataPartSwitch.SetDropdownData(variantSetDropdown,list);
-        j += 1;
-        return j;
+
+        _dataPartSwitch.SetDropdownData(variantSetDropdown, list);
     }
 
     private void HandleInFlightInitialization()
@@ -116,8 +142,10 @@ public class Module_PartSwitch : PartBehaviourModule
             {
                 _dataPartSwitch.ActiveVariants[i] = variant.Variants.First().VariantId;
             }
+
             i += 1;
         }
+
         ApplyInFlight();
     }
 
@@ -135,12 +163,13 @@ public class Module_PartSwitch : PartBehaviourModule
             {
                 _dataPartSwitch.ActiveVariants[i] = variantSet.Variants.First().VariantId;
             }
+
             ApplyVariantCommon(variantSet.Variants.First(variant =>
                 _dataPartSwitch.ActiveVariants[i] == variant.VariantId));
             i++;
         }
     }
-    
+
     private void ApplyVariantCommon(Variant variant)
     {
         foreach (var transformer in variant.Transformers)
@@ -148,6 +177,7 @@ public class Module_PartSwitch : PartBehaviourModule
             transformer.ApplyCommon(this);
         }
     }
+
     private void ApplyInFlight()
     {
         ApplyCommon();
@@ -163,12 +193,13 @@ public class Module_PartSwitch : PartBehaviourModule
             {
                 _dataPartSwitch.ActiveVariants[i] = variantSet.Variants.First().VariantId;
             }
+
             ApplyVariantInFlight(variantSet.Variants.First(variant =>
                 _dataPartSwitch.ActiveVariants[i] == variant.VariantId));
             i++;
         }
     }
-    
+
     private void ApplyVariantInFlight(Variant variant)
     {
         foreach (var transformer in variant.Transformers)
@@ -178,7 +209,7 @@ public class Module_PartSwitch : PartBehaviourModule
     }
 
 
-    private void ApplyInOab()
+    public void ApplyInOab()
     {
         if (_storedState == null) StoreOriginalState();
         ResetToOriginalState();
@@ -190,6 +221,7 @@ public class Module_PartSwitch : PartBehaviourModule
             {
                 _dataPartSwitch.ActiveVariants.Add(variantSet.Variants.First().VariantId);
             }
+
             ApplyVariantInOab(variantSet.Variants.First(variant =>
                 _dataPartSwitch.ActiveVariants[i] == variant.VariantId));
             i++;
@@ -203,7 +235,9 @@ public class Module_PartSwitch : PartBehaviourModule
             transformer.ApplyInOab(this);
         }
     }
-    private void ResetToOriginalState() {
+
+    private void ResetToOriginalState()
+    {
         // IVSwiftLogger.Instance.LogInfo("ResetToOriginalState() called");
         foreach (var (instance, data) in _storedState!.OriginalTransformerData)
         {
@@ -218,11 +252,11 @@ public class Module_PartSwitch : PartBehaviourModule
         foreach (var transformer in from variantSet in _dataPartSwitch!.VariantSets
                  from variant in variantSet.Variants
                  from transformer in variant.Transformers
-                 where !_storedState.OriginalTransformerData.ContainsKey(transformer.Reverter)
+                 where transformer.Reverter != null && !_storedState.OriginalTransformerData.ContainsKey(transformer.Reverter)
                  select transformer)
         {
             var reverter = transformer.Reverter;
-            _storedState.OriginalTransformerData[reverter] = reverter.Store(this);
+            _storedState.OriginalTransformerData[reverter!] = reverter!.Store(this);
         }
     }
 

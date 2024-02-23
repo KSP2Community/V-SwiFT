@@ -10,8 +10,9 @@ public class TransformActivator : ITransformer
 {
     public List<string> Transforms = [];
     
-    public IReverter Reverter => TransformReverter.Instance;
+    public IReverter? Reverter => TransformReverter.Instance;
     public bool SavesInformation => false;
+    public bool VisualizesInformation => false;
 
     public void ApplyInFlight(Module_PartSwitch partSwitch)
     {

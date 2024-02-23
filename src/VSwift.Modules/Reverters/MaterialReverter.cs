@@ -7,7 +7,7 @@ public class MaterialReverter : IReverter
 {
     
     private static MaterialReverter? _instance;
-    public static MaterialReverter Instance => _instance ??= new MaterialReverter();
+    public static MaterialReverter? Instance => _instance ??= new MaterialReverter();
     
     private static void RecursivelyStoreState(GameObject gameObject, Dictionary<Renderer, List<Material>> state)
     {

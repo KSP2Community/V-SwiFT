@@ -11,7 +11,7 @@ namespace VSwift.Modules.Reverters;
 public class ResourceContainerReverter : IReverter
 {
     private static ResourceContainerReverter? _instance;
-    public static ResourceContainerReverter Instance => _instance ??= new ResourceContainerReverter();
+    public static ResourceContainerReverter? Instance => _instance ??= new ResourceContainerReverter();
     public object Store(Module_PartSwitch partSwitch)
     {
         var oabPart = (ObjectAssemblyPart)partSwitch.OABPart;

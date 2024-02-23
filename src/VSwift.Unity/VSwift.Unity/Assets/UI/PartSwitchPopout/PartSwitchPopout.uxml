@@ -1,0 +1,50 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/PartSwitchPopout/PartSwitchPopoutStyle.uss?fileID=7433441132597879392&amp;guid=0ebef2546e6f8f143a8303f04d2255be&amp;type=3#PartSwitchPopoutStyle" />
+    <ui:VisualElement name="window" class="root part-switch-root">
+        <ui:VisualElement name="title" class="part-switch-title">
+            <ui:Label tabindex="-1" text="ROCKETDYNE F-1" display-tooltip-when-elided="true" name="part-name" />
+            <ui:Button text="×" display-tooltip-when-elided="true" name="close-button" />
+        </ui:VisualElement>
+        <ui:VisualElement style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); flex-direction: row;">
+            <ui:ScrollView name="variant-select" horizontal-scroller-visibility="Hidden">
+                <ui:VisualElement class="variant-container selected">
+                    <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" name="variant-name" class="variant-name" />
+                    <ui:Label tabindex="-1" text="Unlockable" display-tooltip-when-elided="true" name="unlockability" class="unlockable" />
+                    <ui:VisualElement name="requirements">
+                        <ui:VisualElement class="requirement-container">
+                            <ui:Label tabindex="-1" text="✓" display-tooltip-when-elided="true" name="is-unlocked" class="unlocked-technology technology-check" />
+                            <ui:Label tabindex="-1" text="Start" display-tooltip-when-elided="true" name="technology" class="unlocked-technology technology-name" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="requirement-container">
+                            <ui:Label tabindex="-1" text="×" display-tooltip-when-elided="true" name="is-unlocked" class="technology-check" />
+                            <ui:Label tabindex="-1" text="Advanced Rocketry" display-tooltip-when-elided="true" name="technology" class="technology-name" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement class="variant-container">
+                    <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" name="variant-name" class="variant-name" />
+                    <ui:Label tabindex="-1" text="Unlockable" display-tooltip-when-elided="true" name="unlockability" class="unlockable" />
+                    <ui:VisualElement name="requirements" />
+                </ui:VisualElement>
+                <ui:VisualElement class="variant-container">
+                    <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" name="variant-name" class="variant-name" />
+                    <ui:Label tabindex="-1" text="Requirements not met" display-tooltip-when-elided="true" name="unlockability" class="locked" />
+                    <ui:VisualElement name="requirements" />
+                </ui:VisualElement>
+            </ui:ScrollView>
+            <ui:VisualElement style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
+                <ui:ScrollView name="variant-information">
+                    <ui:VisualElement name="variant-stat" class="variant-stat">
+                        <ui:Label tabindex="-1" text="STATISTIC 1" display-tooltip-when-elided="true" name="variant-stat-title" class="variant-stat-title" />
+                        <ui:Label tabindex="-1" text="Some long and extended description of this variant&apos;s statistic" display-tooltip-when-elided="true" name="variant-stat-info" enable-rich-text="true" class="variant-stat-info" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="variant-stat" class="variant-stat">
+                        <ui:Label tabindex="-1" text="MASS" display-tooltip-when-elided="true" name="variant-stat-title" class="variant-stat-title" />
+                        <ui:Label tabindex="-1" text="5 t" display-tooltip-when-elided="true" name="variant-stat-info" enable-rich-text="true" class="variant-stat-info" />
+                    </ui:VisualElement>
+                </ui:ScrollView>
+                <ui:Button text="Currently Selected" display-tooltip-when-elided="true" name="select-variant" class="select-variant" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

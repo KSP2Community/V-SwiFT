@@ -1,3 +1,18 @@
 Key,Type,Desc,English
 VSwift/Variants,Text,,Variants
 VSwift/PartSwitch,Text,,Part Switch
+VSwift/Requires,Text,,Requires - {0}
+VSwift/Propellant/SingleMode,Text,,Propellant
+VSwift/Propellant/MultiMode,Text,,Propellant - {0}
+VSwift/Thrust/SingleMode,Text,,Thrust
+VSwift/Thrust/MultiMode,Text,,Thrust - {0}
+VSwift/Thrust/SeaLevel,Text,,Sea Level - {0} kN
+VSwift/Thrust/Vacuum,Text,,Vacuum - {0} kN
+VSwift/ISP/SingleMode,Text,,ISP
+VSwift/ISP/MultiMode,Text,,ISP - {0}
+VSwift/ISP/SeaLevel,Text,,Sea Level - {0}s
+VSwift/ISP/Vacuum,Text,,Vacuum - {0}s
+VSwift/Unlockable,Text,,Unlockable
+VSwift/UnmetRequirements,Text,,Requirements not met
+VSwift/CurrentlySelected,Text,,Currently selected
+VSwift/Select,Text,,Select

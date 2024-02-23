@@ -10,6 +10,7 @@ using Newtonsoft.Json.Linq;
 using VSwift.Modules.Behaviours;
 using VSwift.Modules.Components;
 using VSwift.Modules.Data;
+using VSwift.Modules.Logging;
 
 namespace VSwift.Patches;
 
@@ -32,7 +33,7 @@ public static class StoreVariantPartData
     [HarmonyPatch(typeof(SerializationUtility))]
     [HarmonyILManipulator]
     [HarmonyPatch(nameof(SerializationUtility.SerializePart))]
-    private static void PatchSerializePartsIL(ILContext ilContext, ILLabel endlable)
+    private static void PatchSerializePartsIL(ILContext ilContext, ILLabel endlabel)
     {
         ILCursor cursor = new(ilContext);
         cursor.GotoNext(MoveType.After, instruction => instruction.MatchStloc(0));

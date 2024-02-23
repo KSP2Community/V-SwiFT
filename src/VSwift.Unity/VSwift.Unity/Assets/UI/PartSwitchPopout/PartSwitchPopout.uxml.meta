@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: f332b68489a5fda43a0656525c04122a
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: vswift_ui.bundle
+  assetBundleVariant: 
+  script: {fileID: 13804, guid: 0000000000000000e000000000000000, type: 0}
