@@ -1,4 +1,8 @@
-﻿using HarmonyLib;
+﻿using System.Reflection;
+using Castle.Core.Internal;
+using HarmonyLib;
+using JetBrains.Annotations;
+using KSP.Game;
 using KSP.IO;
 using KSP.Sim;
 using KSP.Sim.Definitions;
@@ -6,14 +10,17 @@ using KSP.Sim.impl;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using Newtonsoft.Json.Linq;
+using UnityEngine;
+using VSwift.Extensions;
 using VSwift.Modules.Extensions;
 using VSwift.Modules.InformationLoaders;
 
 namespace VSwift.Patches;
 
-[HarmonyPatch(typeof(SpaceSimulation))]
+[HarmonyPatch]
 public static class LoadVariantPartData
 {
+    [HarmonyPatch(typeof(SpaceSimulation))]
     [HarmonyPatch(nameof(SpaceSimulation.CreatePart))]
     [HarmonyILManipulator]
     private static void PatchCreatePartIL(ILContext ilContext, ILLabel endLabel)
@@ -32,9 +39,16 @@ public static class LoadVariantPartData
 
     private static PartCore GetPartCore(PartCore originalPartCore, SerializedPart part)
     {
-        if (StoreVariantPartData.FieldInfo.GetValue(part) is not Dictionary<string, Dictionary<string, (string savedType, JToken savedData)>> data)
+        if (part.GetPartSwitchOverride() is not { } data)
             return originalPartCore;
-
+        // Try to get the original variant name
+        var variantName = part.GetCurrentVariantNameString();
+        if (!variantName.IsNullOrEmpty() &&
+            GameManager.Instance.Game.Parts._partData.TryGetValue($"{part.partName}+{variantName}", out var cached))
+        {
+            return cached;
+        }
+        
         var newData = originalPartCore.JsonClone().data;
         List<(string, List<(string, IInformationLoader, JToken)>)> toBeDoublySorted = [];
         foreach (var (idx,variant) in data)
@@ -58,10 +72,36 @@ public static class LoadVariantPartData
                 loader.LoadInformationInto(newData, d);
             }
         }
-        return new PartCore
+
+        // GUIUtility.systemCopyBuffer = IOProvider.ToJson(newData);
+        var result = new PartCore
         {
             version = PartCore.PART_SERIALIZATION_VERSION, // Todo replace this with reflection
             data = newData
         };
+        if (!variantName.IsNullOrEmpty())
+        {
+            GameManager.Instance.Game.Parts._partData[$"{part.partName}+{variantName}"] = result;
+            GameManager.Instance.Game.Parts._partJson[$"{part.partName}+{variantName}"] = IOProvider.ToJson(result);
+        }
+        return result;
+    }
+    
+    [HarmonyPatch(typeof(PartComponent))]
+    [HarmonyPatch(nameof(PartComponent.MergePartModuleData), typeof(List<SerializedPartModule>))]
+    [HarmonyILManipulator]
+    private static void PatchMergePartIL(ILContext ilContext, ILLabel endLabel)
+    {
+        ILCursor cursor = new(ilContext);
+        cursor.GotoNext(MoveType.Before, inst => inst.MatchLdarg(1));
+        cursor.Emit(OpCodes.Ldarg_0);
+        cursor.EmitDelegate(GetVariantName);
+    }
+
+    private static string GetVariantName(string originalName, PartComponent part)
+    {
+        if (part.initialDefinitionData is not PartDefinition partDefinition) return originalName;
+        var result = partDefinition.GetCurrentVariantNameString();
+        return !result.IsNullOrEmpty() ? $"{originalName}+{result}" : originalName;
     }
 }

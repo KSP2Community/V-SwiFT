@@ -7,6 +7,7 @@ using KSP.Sim.impl;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using Newtonsoft.Json.Linq;
+using VSwift.Extensions;
 using VSwift.Modules.Behaviours;
 using VSwift.Modules.Components;
 using VSwift.Modules.Data;
@@ -17,7 +18,6 @@ namespace VSwift.Patches;
 [HarmonyPatch]
 public static class StoreVariantPartData
 {
-    internal static readonly FieldInfo FieldInfo = typeof(SerializedPart).GetField("partSwitchOverrides");
     [HarmonyPatch(typeof(ObjectAssemblyBuilderFileIO))]
     [HarmonyILManipulator]
     [HarmonyPatch(nameof(ObjectAssemblyBuilderFileIO.CollectParts))]
@@ -44,7 +44,7 @@ public static class StoreVariantPartData
 
     private static void SetOverrideDataFlight(SerializedPart serializedPart, PartComponent partComponent)
     {
-        FieldInfo.SetValue(serializedPart,GetOverrideData(partComponent));
+        serializedPart.SetPartSwitchOverride(GetOverrideData(partComponent));
     }
     
     private static Dictionary<string, Dictionary<string, (string savedType, JToken savedValue)>> GetOverrideData(
@@ -55,7 +55,7 @@ public static class StoreVariantPartData
 
     private static void SetOverrideData(SerializedPart serializedPart, IObjectAssemblyPart objectAssemblyPart)
     {
-        FieldInfo.SetValue(serializedPart,GetOverrideData(objectAssemblyPart));
+        serializedPart.SetPartSwitchOverride(GetOverrideData(objectAssemblyPart));
     }
     private static Dictionary<string, Dictionary<string, (string savedType, JToken savedValue)>> GetOverrideData(
         IObjectAssemblyPart objectAssemblyPart) =>
