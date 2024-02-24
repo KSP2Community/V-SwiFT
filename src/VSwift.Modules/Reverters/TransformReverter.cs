@@ -8,14 +8,14 @@ public class TransformReverter : IReverter
     private static TransformReverter? _instance;
     public static TransformReverter? Instance => _instance ??= new TransformReverter();
     
-    public object Store(Module_PartSwitch partSwitch)
+    public object? Store(Module_PartSwitch partSwitch)
     {
-        Dictionary<GameObject, bool> dict = new();
+        Dictionary<GameObject, bool>? dict = new();
         RecursivelyStoreState(partSwitch.gameObject, dict);
         return dict;
     }
 
-    public void Revert(Module_PartSwitch partSwitch, object data)
+    public void Revert(Module_PartSwitch partSwitch, object? data, bool isStartingReset)
     {
         var dict = data as Dictionary<GameObject, bool>;
         foreach (var (obj, state) in dict!)
@@ -23,8 +23,10 @@ public class TransformReverter : IReverter
             obj.SetActive(state);
         }
     }
-    
-    private static void RecursivelyStoreState(GameObject gameObject, Dictionary<GameObject,bool> state)
+
+    public bool RequiresInVariantSet => false;
+
+    private static void RecursivelyStoreState(GameObject gameObject, Dictionary<GameObject, bool>? state)
     {
         foreach (Transform child in gameObject.transform)
         {

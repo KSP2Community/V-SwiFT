@@ -107,7 +107,7 @@ public class PartSwitchPopoutWindowController : MonoBehaviour
         set
         {
             _currentPartSwitchModule!.DataPartSwitch!.ActiveVariants[_variantIndex] = value;
-            _currentPartSwitchModule.ApplyInOab();
+            _currentPartSwitchModule.ApplyInOab(false,_currentPartSwitchModule!.DataPartSwitch!.VariantSets[_variantIndex]);
         }
     }
 

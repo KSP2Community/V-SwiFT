@@ -9,7 +9,7 @@ public class MaterialReverter : IReverter
     private static MaterialReverter? _instance;
     public static MaterialReverter? Instance => _instance ??= new MaterialReverter();
     
-    private static void RecursivelyStoreState(GameObject gameObject, Dictionary<Renderer, List<Material>> state)
+    private static void RecursivelyStoreState(GameObject gameObject, Dictionary<Renderer, List<Material>>? state)
     {
         var renderers = gameObject.GetComponents<Renderer>();
         foreach (var renderer in renderers)
@@ -23,14 +23,14 @@ public class MaterialReverter : IReverter
         }
     }
 
-    public object Store(Module_PartSwitch partSwitch)
+    public object? Store(Module_PartSwitch partSwitch)
     {
-        Dictionary<Renderer, List<Material>> dict = new();
+        Dictionary<Renderer, List<Material>>? dict = new();
         RecursivelyStoreState(partSwitch.gameObject, dict);
         return dict;
     }
 
-    public void Revert(Module_PartSwitch partSwitch, object data)
+    public void Revert(Module_PartSwitch partSwitch, object? data, bool isStartingReset)
     {
         var dict = data as Dictionary<Renderer, List<Material>>;
         foreach (var (renderer, mats) in dict!)
@@ -41,4 +41,6 @@ public class MaterialReverter : IReverter
             }
         }
     }
+
+    public bool RequiresInVariantSet => false;
 }

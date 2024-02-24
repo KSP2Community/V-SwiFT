@@ -11,7 +11,7 @@ using VSwift.Modules.Variants;
 namespace VSwift.Modules.Data;
 
 // ReSharper disable once InconsistentNaming
-public class Data_PartSwitch : ModuleData
+public class Data_PartSwitch : ModuleData, IMassModifier
 {
     public override Type ModuleType => typeof(Module_PartSwitch);
 
@@ -65,7 +65,6 @@ public class Data_PartSwitch : ModuleData
     public Dictionary<string, Dictionary<string, (string savedType, JToken savedValue)>>? GetStoredVariantInformation()
     {
         var i = 0;
-        var anyStored = false;
         Dictionary<string, Dictionary<string, (string savedType, JToken savedValue)>> result = [];
         foreach (var variantSet in VariantSets)
         {
@@ -84,7 +83,6 @@ public class Data_PartSwitch : ModuleData
             var j = 0;
             foreach (var transformer in variant.Transformers.Where(transformer => transformer.SavesInformation))
             {
-                anyStored = true;
                 var savedInformation = transformer.SaveInformation();
                 currentSet[$"{j++}"] =
                     (savedInformation.savedType.AssemblyQualifiedName, savedInformation.savedValue);
@@ -92,6 +90,8 @@ public class Data_PartSwitch : ModuleData
             i += 1;
         }
 
-        return anyStored ? result : null; // Just make it easier when deserializing
+        return result; // Just make it easier when deserializing
     }
+
+    [KSPState] public float MassModifier { get; set; } = 0;
 }

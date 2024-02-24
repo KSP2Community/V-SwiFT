@@ -16,3 +16,6 @@ VSwift/Unlockable,Text,,Unlockable
 VSwift/UnmetRequirements,Text,,Requirements not met
 VSwift/CurrentlySelected,Text,,Currently selected
 VSwift/Select,Text,,Select
+VSwift/Mass,Text,,Mass
+VSwift/MassModifier,Text,,Mass
+VSwift/Mass/Description,Text,,{0} t

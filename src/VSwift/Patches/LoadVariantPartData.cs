@@ -14,6 +14,7 @@ using UnityEngine;
 using VSwift.Extensions;
 using VSwift.Modules.Extensions;
 using VSwift.Modules.InformationLoaders;
+using VSwift.Modules.Logging;
 
 namespace VSwift.Patches;
 
@@ -100,6 +101,10 @@ public static class LoadVariantPartData
 
     private static string GetVariantName(string originalName, PartComponent part)
     {
+        IVSwiftLogger.Instance.LogInfo($"Getting Variant Name of (original: {originalName}, partName: {part.PartName})");
+#pragma warning disable Harmony003
+        originalName ??= part.PartName;
+#pragma warning restore Harmony003
         if (part.initialDefinitionData is not PartDefinition partDefinition) return originalName;
         var result = partDefinition.GetCurrentVariantNameString();
         return !result.IsNullOrEmpty() ? $"{originalName}+{result}" : originalName;

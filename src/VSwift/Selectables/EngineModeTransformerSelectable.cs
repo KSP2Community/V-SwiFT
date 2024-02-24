@@ -101,7 +101,7 @@ public sealed class EngineModeTransformerSelectable : BaseSelectable
 
     /// <inheritdoc />
     public override bool IsSameAs(ISelectable other) =>
-        (other is DataEngineSelectable dataEngineSelectable) &&
+        (other is EngineModeTransformerSelectable dataEngineSelectable) &&
         SerializedData == dataEngineSelectable.SerializedData;
 
     /// <inheritdoc />

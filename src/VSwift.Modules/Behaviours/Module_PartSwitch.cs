@@ -1,6 +1,7 @@
 ﻿using Castle.Core.Internal;
 using I2.Loc;
 using KSP.Game;
+using KSP.OAB;
 using KSP.Sim.Definitions;
 using KSP.UI.Binding;
 using Newtonsoft.Json.Linq;
@@ -21,7 +22,7 @@ public class Module_PartSwitch : PartBehaviourModule
     private class StoredState
     {
         // public readonly List<(GameObject gameObject, bool state)> OriginalTransforms = [];
-        public readonly Dictionary<IReverter, object> OriginalTransformerData = [];
+        public readonly Dictionary<IReverter, object?> OriginalTransformerData = [];
     }
 
     public override Type PartComponentModuleType => typeof(PartComponentModule_PartSwitch);
@@ -47,8 +48,8 @@ public class Module_PartSwitch : PartBehaviourModule
 
     private void HandleInOabInitialization()
     {
-        var j = _dataPartSwitch!.VariantSets.Aggregate(0, HandleVariantSetInOab);
-        ApplyInOab();
+        _dataPartSwitch!.VariantSets.Aggregate(0, HandleVariantSetInOab);
+        ApplyInOab(true);
     }
 
     private int HandleVariantSetInOab(int j, VariantSet variantSet)
@@ -105,7 +106,7 @@ public class Module_PartSwitch : PartBehaviourModule
             try
             {
                 _dataPartSwitch.ActiveVariants[j] = newVariant;
-                ApplyInOab();
+                ApplyInOab(false,variantSet);
             }
             catch (Exception e)
             {
@@ -209,10 +210,10 @@ public class Module_PartSwitch : PartBehaviourModule
     }
 
 
-    public void ApplyInOab()
+    public void ApplyInOab(bool isStarting,VariantSet? swapped=null)
     {
         if (_storedState == null) StoreOriginalState();
-        ResetToOriginalState();
+        ResetToOriginalState(isStarting,swapped);
         ApplyCommon();
         var i = 0;
         foreach (var variantSet in _dataPartSwitch!.VariantSets)
@@ -226,6 +227,7 @@ public class Module_PartSwitch : PartBehaviourModule
                 _dataPartSwitch.ActiveVariants[i] == variant.VariantId));
             i++;
         }
+        (OABPart as ObjectAssemblyPart)?.UpdateMassValues();
     }
 
     private void ApplyVariantInOab(Variant variant)
@@ -236,13 +238,16 @@ public class Module_PartSwitch : PartBehaviourModule
         }
     }
 
-    private void ResetToOriginalState()
+    private void ResetToOriginalState(bool isStarting=false,VariantSet? swapped=null)
     {
+        _dataPartSwitch!.MassModifier = 0.0f;
         // IVSwiftLogger.Instance.LogInfo("ResetToOriginalState() called");
         foreach (var (instance, data) in _storedState!.OriginalTransformerData)
         {
             // IVSwiftLogger.Instance.LogInfo($"Reverting {instance} with data {data}");
-            instance.Revert(this, data);
+            if (!instance.RequiresInVariantSet ||
+                (swapped != null && swapped.Variants.Any(x => x.Transformers.Any(y => y.Reverter == instance))))
+                instance.Revert(this, data, isStarting);
         }
     }
 
