@@ -22,8 +22,7 @@ public class EngineModesReverter : IReverter
         if (!partSwitch.OABPart.TryGetModule(out Module_Engine moduleEngine)) return;
         moduleEngine.OnShutdown();
         var clonedData = moduleEngine.dataEngine.JsonClone();
-        IVSwiftLogger.Instance.LogInfo($"Reverted current engine mode to {clonedData.currentEngineModeIndex} {clonedData.currentEngineModeData}");
-        clonedData.engineModes = ((List<Data_Engine.EngineMode>)data).ToArray();
+        clonedData.engineModes = ((List<Data_Engine.EngineMode>)data!).ToArray();
         moduleEngine.DataModules[typeof(Data_Engine)] = moduleEngine.dataEngine = clonedData;
         moduleEngine.dataEngine.RebuildDataContext();
         moduleEngine.OnInitialize();

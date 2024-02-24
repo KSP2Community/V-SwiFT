@@ -12,14 +12,11 @@ public class DynamicAttachNodeReverter(List<string> dynamicNodeNames) : IReverte
 
     public void Revert(Module_PartSwitch partSwitch, object? data, bool isStartingReset)
     {
-        IVSwiftLogger.Instance.LogInfo($"Attempting to remove nodes: {isStartingReset}");
         if (isStartingReset) return;
         foreach (var nodeName in dynamicNodeNames)
         {
-            IVSwiftLogger.Instance.LogInfo($"Removing {nodeName}");
             if (partSwitch.OABPart.FindNodeWithTag(nodeName) is {} node)
             {
-                IVSwiftLogger.Instance.LogInfo($"Which is {node}");
                 partSwitch.OABPart.RemoveDynamicNode(node);
             }
         }

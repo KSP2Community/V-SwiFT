@@ -28,7 +28,6 @@ public class AttachNodeAdder : ITransformer
     {
         foreach (var definition in Nodes)
         {
-            IVSwiftLogger.Instance.LogInfo($"Adding node: {definition.nodeID}");
             if (partSwitch.OABPart.FindNodeWithTag(definition.nodeID) is {} node)
             {
                 partSwitch.OABPart.SetNodeLocalPosition(node, definition.position);
@@ -36,7 +35,6 @@ public class AttachNodeAdder : ITransformer
             }
             else
             {
-                IVSwiftLogger.Instance.LogInfo($"Should be creating: {definition.nodeID}");
                 partSwitch.OABPart.AddDynamicNode(partSwitch.OABPart,
                     new ObjectAssemblyAvailablePartNode(definition.size,
                         definition.position,
