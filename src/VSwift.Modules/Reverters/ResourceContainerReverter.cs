@@ -11,8 +11,8 @@ namespace VSwift.Modules.Reverters;
 public class ResourceContainerReverter : IReverter
 {
     private static ResourceContainerReverter? _instance;
-    public static ResourceContainerReverter Instance => _instance ??= new ResourceContainerReverter();
-    public object Store(Module_PartSwitch partSwitch)
+    public static ResourceContainerReverter? Instance => _instance ??= new ResourceContainerReverter();
+    public object? Store(Module_PartSwitch partSwitch)
     {
         var oabPart = (ObjectAssemblyPart)partSwitch.OABPart;
         // return oabPart.AvailablePart.PartData.resourceContainers.ToList();
@@ -21,7 +21,7 @@ public class ResourceContainerReverter : IReverter
         return partCore.data.resourceContainers;
     }
 
-    public void Revert(Module_PartSwitch partSwitch, object data)
+    public void Revert(Module_PartSwitch partSwitch, object? data, bool isStartingReset)
     {
         // IVSwiftLogger.Instance.LogInfo("Reverting!!!");
         var oabPart = (ObjectAssemblyPart)partSwitch.OABPart;
@@ -48,4 +48,6 @@ public class ResourceContainerReverter : IReverter
         moduleResourceCapacities.dataResourceCapacities.RebuildDataContext();
         moduleResourceCapacities.OnInitialize();
     }
+
+    public bool RequiresInVariantSet => false;
 }

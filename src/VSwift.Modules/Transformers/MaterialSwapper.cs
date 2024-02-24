@@ -14,8 +14,9 @@ public class MaterialSwapper : ITransformer
     private Dictionary<string,Material> _material = [];
 
 
-    public IReverter Reverter => MaterialReverter.Instance;
+    public IReverter? Reverter => MaterialReverter.Instance;
     public bool SavesInformation => false;
+    public bool VisualizesInformation => true;
 
     public void ApplyInFlight(Module_PartSwitch partSwitch)
     {

@@ -24,8 +24,9 @@ public class ResourceContainerAdder : ITransformer
     public List<ContainedResourceDefinition> Containers = [];
 
 
-    public IReverter Reverter => ResourceContainerReverter.Instance;
+    public IReverter? Reverter => ResourceContainerReverter.Instance;
     public bool SavesInformation => true;
+    public bool VisualizesInformation => true;
 
     public void ApplyInFlight(Module_PartSwitch partSwitch)
     {
