@@ -1,4 +1,8 @@
-﻿using KSP.Sim.Definitions;
+﻿using System.Reflection;
+using KSP.Game;
+using KSP.IO;
+using KSP.OAB;
+using KSP.Sim.Definitions;
 using Newtonsoft.Json.Linq;
 using VSwift.Modules.Behaviours;
 using VSwift.Modules.Extensions;
@@ -7,37 +11,42 @@ namespace VSwift.Modules.Reverters;
 
 public class ModuleDefinitionReverter : IReverter
 {
-    private Type _type;
-    private ModuleDefinitionReverter(Type t)
+    private Type _moduleType;
+    private Type _dataType;
+    private FieldInfo _info;
+    private ModuleDefinitionReverter(Type moduleType, Type dataType, string key)
     {
-        _type = t;
+        _moduleType = moduleType;
+        _dataType = dataType;
+        _info = dataType.GetField(key, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic) ??
+                throw new Exception($"Invalid field of {dataType}: {key}");
     }
 
-    private static readonly Dictionary<Type, ModuleDefinitionReverter> Instances = [];
-    public static ModuleDefinitionReverter GetInstanceFor(Type t) =>
-        Instances.TryGetValue(t,
+    private static readonly Dictionary<(Type, Type, string), ModuleDefinitionReverter> Instances = [];
+    public static ModuleDefinitionReverter GetInstanceFor(Type moduleType, Type dataType, string key) =>
+        Instances.TryGetValue((moduleType, dataType, key),
             out var result)
             ? result
-            : Instances[t] = new ModuleDefinitionReverter(t);
+            : Instances[(moduleType,dataType,key)] = new ModuleDefinitionReverter(moduleType, dataType, key);
 
     public object? Store(Module_PartSwitch partSwitch) =>
-        partSwitch.OABPart.TryGetModule(_type,
+        partSwitch.OABPart.TryGetModule(_moduleType,
             out var toBeStored)
-            ? (toBeStored.DataModules.KeysList.ToList(),toBeStored.DataModules.ValuesList.Select(data => data.JsonClone()).ToList())
+            ? toBeStored.DataModules.TryGetValue(_dataType, out var data)
+                ? IOProvider.ToJson(_info.GetValue(data))
+                : null
             : null;
 
     public void Revert(Module_PartSwitch partSwitch, object? data, bool isStartingReset)
     {
         if (isStartingReset) return;
         if (data == null) return;
-        var trueData = ((List<Type>,List<ModuleData>))data;
-        if (!partSwitch.OABPart.TryGetModule(_type, out var toBeLoaded)) return;
+        var trueData = (string)data;
+        if (!partSwitch.OABPart.TryGetModule(_moduleType, out var toBeLoaded)) return;
+        if (!toBeLoaded.DataModules.TryGetValue(_dataType, out var toBeModified)) return;
         toBeLoaded.OnShutdown();
-        foreach (var context in toBeLoaded.DataModules.list) context.ModuleDataContext.ClearAllData();
-        toBeLoaded.DataModules.listKeys = trueData.Item1;
-        toBeLoaded.DataModules.list = trueData.Item2.JsonClone();
-        foreach (var context in toBeLoaded.DataModules.list) context.PrepareDataContext();
-        toBeLoaded.AddDataModules();
+        _info.SetValue(toBeModified, IOProvider.FromJson(trueData, _info.FieldType));
+        toBeModified.RebuildDataContext();
         toBeLoaded.OnInitialize();
     }
 

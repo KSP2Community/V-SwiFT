@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using KSP.Modules;
+using UnityEngine;
 using VSwift.Modules.Behaviours;
 
 namespace VSwift.Modules.Reverters;
@@ -39,6 +40,11 @@ public class MaterialReverter : IReverter
             {
                 renderer.materials[i].CopyPropertiesFromMaterial(mats[i]);
             }
+        }
+        
+        if (partSwitch.OABPart.TryGetModule(out Module_Color moduleColor))
+        {
+            moduleColor.RefreshColors();
         }
     }
 

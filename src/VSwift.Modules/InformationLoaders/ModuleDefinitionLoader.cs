@@ -20,7 +20,7 @@ public class ModuleDefinitionLoader : IInformationLoader
             var dataObject = module.ModuleData.FirstOrDefault(x => x.DataType == dataType).DataObject;
             var field = dataType.GetField(key, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             if (field == null) return;
-            field.SetValue(dataObject,IOProvider.FromJson(value.ToString(Formatting.None),dataType));
+            field.SetValue(dataObject,IOProvider.FromJson(value.ToString(Formatting.None),field.FieldType));
         }
         catch (Exception e)
         {
