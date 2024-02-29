@@ -32,8 +32,12 @@ public sealed class PartSwitchSelectable : BaseSelectable
         foreach (var field in SerializedData)
         {
             Classes.Add(field.Key);
+            if (field.Key == "PredefinedDynamicNodes")
+            {
+                Children.Add(new PredefinedDynamicNodeSelectable((JArray)field.Value,Selectable));
+            }
         }
-        var sets = SerializedData["VariantSets"];
+        var sets = SerializedData["VariantSets"]!;
         foreach (var set in sets)
         {
             var setObject = (JObject)set;

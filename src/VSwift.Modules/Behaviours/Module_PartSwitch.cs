@@ -2,6 +2,7 @@
 using I2.Loc;
 using KSP.Game;
 using KSP.OAB;
+using KSP.Sim;
 using KSP.Sim.Definitions;
 using KSP.UI.Binding;
 using Newtonsoft.Json.Linq;
@@ -50,6 +51,19 @@ public class Module_PartSwitch : PartBehaviourModule
     {
         _dataPartSwitch!.VariantSets.Aggregate(0, HandleVariantSetInOab);
         ApplyInOab(true);
+        foreach (var predefinedNode in _dataPartSwitch.PredefinedDynamicNodes.Where(predefinedNode => OABPart.FindNodeWithTag(predefinedNode.nodeID) == null))
+        {
+            OABPart.AddDynamicNode(OABPart, new ObjectAssemblyAvailablePartNode(
+                predefinedNode.size,
+                predefinedNode.position,
+                Quaternion.LookRotation(predefinedNode.orientation,Vector3.up),
+                predefinedNode.nodeID,
+                null,
+                predefinedNode.size,
+                AttachNodeType.Stack,
+                true
+            ));
+        }
     }
 
     private int HandleVariantSetInOab(int j, VariantSet variantSet)
