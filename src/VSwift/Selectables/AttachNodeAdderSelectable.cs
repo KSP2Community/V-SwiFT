@@ -84,8 +84,10 @@ public sealed class AttachNodeAdderSelectable : BaseSelectable
         };
         var json = JObject.FromObject(engineModeData);
         ((JArray)SerializedData["Nodes"]!).Add(json);
-        return new JTokenSelectable(Selectable.SetModified, json, mode => mode["nodeID"].Value<string>(),
+        var selectable =  new JTokenSelectable(Selectable.SetModified, json, mode => mode["nodeID"].Value<string>(),
             "attach_node");
+        Children.Add(selectable);
+        return selectable;
     }
 
     public override string Serialize() => SerializedData.ToString();

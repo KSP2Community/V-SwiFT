@@ -19,3 +19,5 @@ VSwift/Select,Text,,Select
 VSwift/Mass,Text,,Mass
 VSwift/MassModifier,Text,,Mass
 VSwift/Mass/Description,Text,,{0} t
+VSwift/MaxTemp/Title,Text,,Max Temp
+VSwift/MaxTemp/Description,Text,,{0} K

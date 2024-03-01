@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using KSP.Modules;
+using UnityEngine;
 using VSwift.Modules.Behaviours;
 
 namespace VSwift.Modules.Reverters;
@@ -40,6 +41,7 @@ public class MaterialReverter : IReverter
                 renderer.materials[i].CopyPropertiesFromMaterial(mats[i]);
             }
         }
+        partSwitch.QueueUpdateColors();
     }
 
     public bool RequiresInVariantSet => false;

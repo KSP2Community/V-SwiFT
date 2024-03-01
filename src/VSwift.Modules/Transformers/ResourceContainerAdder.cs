@@ -61,6 +61,7 @@ public class ResourceContainerAdder : ITransformer
         if (!oabPart.TryGetModule(typeof(Module_ResourceCapacities), out var module)) return;
         var moduleResourceCapacities = (Module_ResourceCapacities)module;
         moduleResourceCapacities.OnShutdown();
+        moduleResourceCapacities._valueChangeHandlers.Clear();
         moduleResourceCapacities.dataResourceCapacities.RebuildDataContext();
         moduleResourceCapacities.OnInitialize();
     }

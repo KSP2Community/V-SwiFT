@@ -20,6 +20,8 @@ public class Data_PartSwitch : ModuleData, IMassModifier
 
     [KSPState] public List<string> ActiveVariants = [];
 
+    [KSPDefinition] public List<AttachNodeDefinition> PredefinedDynamicNodes = [];
+    
     // [KSPState] public List<(string, bool)>? OriginalGameObjectStates = null;
 
     public override List<OABPartData.PartInfoModuleEntry> GetPartInfoEntries(Type partBehaviourModuleType,

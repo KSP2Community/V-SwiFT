@@ -1,4 +1,5 @@
 ﻿using KSP.Game;
+using KSP.Modules;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using VSwift.Modules.Behaviours;
@@ -46,6 +47,7 @@ public class MaterialSwapper : ITransformer
                 RecursivelySwitch(partSwitch.gameObject, from, mat);
             }
         }
+        partSwitch.QueueUpdateColors();
     }
 
     private void LoadMaterial(string name, Action<Material> callback)
