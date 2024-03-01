@@ -16,7 +16,7 @@ public class AttachNodeAdder : ITransformer
     [UsedImplicitly] public List<AttachNodeDefinition> Nodes = [];
 
     [JsonIgnore] private IReverter? _reverter;
-    public IReverter? Reverter => _reverter ??= new DynamicAttachNodeReverter(Nodes.Select(x => x.nodeID).ToList());
+    [JsonIgnore] public IReverter? Reverter => _reverter ??= new DynamicAttachNodeReverter(Nodes.Select(x => x.nodeID).ToList());
     public bool SavesInformation => false;
     public bool VisualizesInformation => false;
 

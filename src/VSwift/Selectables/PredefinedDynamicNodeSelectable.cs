@@ -58,7 +58,7 @@ public sealed class PredefinedDynamicNodeSelectable : BaseSelectable
             nodeID = elementType
         };
         var json = JObject.FromObject(engineModeData);
-            Nodes.Add(json);
+        Nodes.Add(json);
         var selectable =  new JTokenSelectable(Selectable.SetModified, json, mode => mode["nodeID"].Value<string>(),
             "attach_node");
         Children.Add(selectable);
@@ -70,7 +70,7 @@ public sealed class PredefinedDynamicNodeSelectable : BaseSelectable
     public override DataValue GetValue() => DataValue.FromJToken(Nodes);
 
     public override List<ISelectable> Children { get; }
-    public override string Name => nameof(PredefinedDynamicNodeSelectable);
+    public override string Name => "PredefinedDynamicNodes";
     public override List<string> Classes { get; }
     public override string ElementType => Name;
 }

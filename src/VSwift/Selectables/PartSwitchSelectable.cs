@@ -6,6 +6,7 @@ using PatchManager.SassyPatching;
 using PatchManager.SassyPatching.Interfaces;
 using PatchManager.SassyPatching.Modifiables;
 using VSwift.Modules.Data;
+using VSwift.Modules.Logging;
 using VSwift.Modules.Variants;
 
 namespace VSwift.Selectables;
@@ -31,6 +32,7 @@ public sealed class PartSwitchSelectable : BaseSelectable
         MatchedClasses = [];
         foreach (var field in SerializedData)
         {
+            // IVSwiftLogger.Instance.LogInfo($"Adding {field.Key} = {field.Value}");
             Classes.Add(field.Key);
             if (field.Key == "PredefinedDynamicNodes")
             {

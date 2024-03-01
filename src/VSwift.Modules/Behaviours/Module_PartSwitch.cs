@@ -1,6 +1,9 @@
-﻿using Castle.Core.Internal;
+﻿using System.Collections;
+using Castle.Core.Internal;
 using I2.Loc;
 using KSP.Game;
+using KSP.Messages;
+using KSP.Modules;
 using KSP.OAB;
 using KSP.Sim;
 using KSP.Sim.Definitions;
@@ -121,6 +124,7 @@ public class Module_PartSwitch : PartBehaviourModule
             {
                 _dataPartSwitch.ActiveVariants[j] = newVariant;
                 ApplyInOab(false,variantSet);
+                QueuePamUpdate();
             }
             catch (Exception e)
             {
@@ -215,6 +219,36 @@ public class Module_PartSwitch : PartBehaviourModule
         }
     }
 
+    public void QueuePamUpdate()
+    {
+        StartCoroutine(UpdatePam());
+    }
+
+    private IEnumerator UpdatePam()
+    {
+        yield return new WaitForEndOfFrame();
+        var objectAssemblyPart = (ObjectAssemblyPart)OABPart;
+        Game.PartsManager.IsVisible = true;
+        Game.PartsManager.PartsList.ScrollToPart(objectAssemblyPart.GlobalId);
+        Game.Messages.Publish<PartManagerOpenedMessage>();
+    }
+
+    public void QueueUpdateColors()
+    {
+        StartCoroutine(UpdateColors());
+    }
+
+    private IEnumerator UpdateColors()
+    {
+        yield return new WaitForEndOfFrame();
+        yield return new WaitForEndOfFrame();
+        yield return new WaitForEndOfFrame();
+        if (OABPart.TryGetModule(out Module_Color moduleColor))
+        {
+            moduleColor.RefreshColors();
+        }
+    }
+    
     private void ApplyVariantInFlight(Variant variant)
     {
         foreach (var transformer in variant.Transformers)

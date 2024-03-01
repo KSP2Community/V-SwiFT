@@ -54,7 +54,7 @@ public class ModuleDefinitionTransformer : ITransformer
     [UsedImplicitly]
     public JToken Value = "";
 
-    public IReverter? Reverter => ModuleDefinitionReverter.GetInstanceFor(ActualBehaviourType, ActualDataType, Key);
+    [JsonIgnore] public IReverter? Reverter => ModuleDefinitionReverter.GetInstanceFor(ActualBehaviourType, ActualDataType, Key);
     public bool SavesInformation => true;
     public bool VisualizesInformation => false;
     public void ApplyInFlight(Module_PartSwitch partSwitch)

@@ -47,11 +47,7 @@ public class MaterialSwapper : ITransformer
                 RecursivelySwitch(partSwitch.gameObject, from, mat);
             }
         }
-
-        if (partSwitch.OABPart.TryGetModule(out Module_Color moduleColor))
-        {
-            moduleColor.RefreshColors();
-        }
+        partSwitch.QueueUpdateColors();
     }
 
     private void LoadMaterial(string name, Action<Material> callback)

@@ -1,7 +1,6 @@
 ﻿using JetBrains.Annotations;
-using KSP.Sim.Definitions;
-using UnityEngine;
 using VSwift.Modules.Behaviours;
+using VSwift.Modules.Extensions;
 using VSwift.Modules.Reverters;
 
 namespace VSwift.Modules.Transformers;
@@ -10,7 +9,7 @@ namespace VSwift.Modules.Transformers;
 public class AttachNodeMover : ITransformer
 {
     [UsedImplicitly]
-    public Dictionary<string, Vector3> MovedNodes = [];
+    public Dictionary<string, Vector3d> MovedNodes = [];
     public IReverter? Reverter => PredefinedNodeReverter.Instance;
     public bool SavesInformation => false;
     public bool VisualizesInformation => false;
@@ -24,7 +23,7 @@ public class AttachNodeMover : ITransformer
         {
             if (partSwitch.OABPart.FindNodeWithTag(node) is { } actualNode)
             {
-                partSwitch.OABPart.SetNodeLocalPosition(actualNode, pos);
+                partSwitch.OABPart.FixedSetNodeLocalPosition(actualNode, pos);
             } 
         }
     }

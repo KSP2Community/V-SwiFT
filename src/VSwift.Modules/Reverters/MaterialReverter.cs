@@ -41,11 +41,7 @@ public class MaterialReverter : IReverter
                 renderer.materials[i].CopyPropertiesFromMaterial(mats[i]);
             }
         }
-        
-        if (partSwitch.OABPart.TryGetModule(out Module_Color moduleColor))
-        {
-            moduleColor.RefreshColors();
-        }
+        partSwitch.QueueUpdateColors();
     }
 
     public bool RequiresInVariantSet => false;

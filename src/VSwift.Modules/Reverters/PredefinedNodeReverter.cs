@@ -1,4 +1,5 @@
 ﻿using VSwift.Modules.Behaviours;
+using VSwift.Modules.Extensions;
 
 namespace VSwift.Modules.Reverters;
 
@@ -23,7 +24,7 @@ public class PredefinedNodeReverter : IReverter
         {
             if (partSwitch.OABPart.FindNodeWithTag(node.nodeID) is { } actualNode)
             {
-                partSwitch.OABPart.SetNodeLocalPosition(actualNode, node.position);
+                partSwitch.OABPart.FixedSetNodeLocalPosition(actualNode, node.position);
             }
         }
     }
