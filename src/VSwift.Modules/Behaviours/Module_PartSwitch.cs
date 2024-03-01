@@ -12,6 +12,7 @@ using Newtonsoft.Json.Linq;
 using UnityEngine;
 using VSwift.Modules.Components;
 using VSwift.Modules.Data;
+using VSwift.Modules.Extensions;
 using VSwift.Modules.Logging;
 using VSwift.Modules.Reverters;
 using VSwift.Modules.Transformers;
@@ -53,20 +54,27 @@ public class Module_PartSwitch : PartBehaviourModule
     private void HandleInOabInitialization()
     {
         _dataPartSwitch!.VariantSets.Aggregate(0, HandleVariantSetInOab);
-        ApplyInOab(true);
         foreach (var predefinedNode in _dataPartSwitch.PredefinedDynamicNodes.Where(predefinedNode => OABPart.FindNodeWithTag(predefinedNode.nodeID) == null))
         {
-            OABPart.AddDynamicNode(OABPart, new ObjectAssemblyAvailablePartNode(
-                predefinedNode.size,
-                predefinedNode.position,
-                Quaternion.LookRotation(predefinedNode.orientation,Vector3.up),
-                predefinedNode.nodeID,
-                null,
-                predefinedNode.size,
-                AttachNodeType.Stack,
-                true
-            ));
+            if (OABPart.FindNodeWithTag(predefinedNode.nodeID) is { } node)
+            {
+                OABPart.FixedSetNodeLocalPosition(node, predefinedNode.position);
+            }
+            else
+            {
+                OABPart.AddDynamicNode(OABPart, new ObjectAssemblyAvailablePartNode(
+                    predefinedNode.size,
+                    predefinedNode.position,
+                    Quaternion.LookRotation(predefinedNode.orientation, Vector3.up),
+                    predefinedNode.nodeID,
+                    null,
+                    predefinedNode.size,
+                    AttachNodeType.Stack,
+                    true
+                ));
+            }
         }
+        ApplyInOab(true);
     }
 
     private int HandleVariantSetInOab(int j, VariantSet variantSet)
@@ -240,12 +248,21 @@ public class Module_PartSwitch : PartBehaviourModule
 
     private IEnumerator UpdateColors()
     {
-        yield return new WaitForEndOfFrame();
-        yield return new WaitForEndOfFrame();
-        yield return new WaitForEndOfFrame();
-        if (OABPart.TryGetModule(out Module_Color moduleColor))
+        yield return new WaitForSeconds(0.5f);
+        if (PartBackingMode == PartBackingModes.OAB)
         {
-            moduleColor.RefreshColors();
+
+            if (OABPart.TryGetModule(out Module_Color moduleColor))
+            {
+                moduleColor.RefreshColors();
+            }
+        }
+        else
+        {
+            if (part.GetModule<Module_Color>() is { } moduleColor)
+            {
+                moduleColor.RefreshColors();
+            }
         }
     }
     
