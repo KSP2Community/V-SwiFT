@@ -1,4 +1,6 @@
-﻿using KSP.Game;
+﻿using System;
+using System.Collections.Generic;
+using KSP.Game;
 using KSP.Modules;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -6,80 +8,82 @@ using VSwift.Modules.Behaviours;
 using VSwift.Modules.Logging;
 using VSwift.Modules.Reverters;
 
-namespace VSwift.Modules.Transformers;
-
-[Transformer(nameof(MaterialSwapper))]
-public class MaterialSwapper : ITransformer
+namespace VSwift.Modules.Transformers
 {
-    public Dictionary<string, string> Swaps = [];
-    private Dictionary<string,Material> _material = [];
-
-
-    public IReverter? Reverter => MaterialReverter.Instance;
-    public bool SavesInformation => false;
-    public bool VisualizesInformation => true;
-
-    public void ApplyInFlight(Module_PartSwitch partSwitch)
+    [Transformer(nameof(MaterialSwapper))]
+    public class MaterialSwapper : ITransformer
     {
-    }
+        public Dictionary<string, string> Swaps = new() { };
+        private Dictionary<string,Material> _material = new() { };
 
-    public void ApplyInOab(Module_PartSwitch partSwitch)
-    {
-    }
 
-    public void ApplyCommon(Module_PartSwitch partSwitch)
-    {
-        // _material ??= LoadMaterial();
-        // if (_material == null) return;
-        // RecursivelySwitch(partSwitch.gameObject, _material);
-        foreach (var (from, to) in Swaps)
+        public IReverter? Reverter => MaterialReverter.Instance;
+        public bool SavesInformation => false;
+        public bool VisualizesInformation => true;
+
+        public void ApplyInFlight(Module_PartSwitch partSwitch)
         {
-            if (!_material.TryGetValue(to, out var mat))
+        }
+
+        public void ApplyInOab(Module_PartSwitch partSwitch)
+        {
+        }
+
+        public void ApplyCommon(Module_PartSwitch partSwitch)
+        {
+            // _material ??= LoadMaterial();
+            // if (_material == null) return;
+            // RecursivelySwitch(partSwitch.gameObject, _material);
+            foreach (var (from, to) in Swaps)
             {
-                LoadMaterial(to, m =>
+                if (!_material.TryGetValue(to, out var mat))
                 {
-                    _material[to] = m;
-                    RecursivelySwitch(partSwitch.gameObject, from, m);
-                });
+                    LoadMaterial(to, m =>
+                    {
+                        _material[to] = m;
+                        RecursivelySwitch(partSwitch.gameObject, from, m);
+                    });
+                }
+                else
+                {
+                    RecursivelySwitch(partSwitch.gameObject, from, mat);
+                }
+            }
+            partSwitch.QueueUpdateColors();
+        }
+
+        private void LoadMaterial(string name, Action<Material> callback)
+        {
+            // TODO: Look at solely supporting addressables
+            if (name.StartsWith("addressables://"))
+            {
+                var addressableKey = name.Replace("addressables://", "");
+                GameManager.Instance.Assets.Load(addressableKey, callback);
             }
             else
             {
-                RecursivelySwitch(partSwitch.gameObject, from, mat);
+                throw new Exception($"Unknown material {name}");
             }
         }
-        partSwitch.QueueUpdateColors();
-    }
-
-    private void LoadMaterial(string name, Action<Material> callback)
-    {
-        if (name.StartsWith("addressables://"))
-        {
-            var addressableKey = name.Replace("addressables://", "");
-            GameManager.Instance.Assets.Load(addressableKey, callback);
-        }
-        else
-        {
-            throw new Exception($"Unknown material {name}");
-        }
-    }
     
-    private void RecursivelySwitch(GameObject gameObject, string name, Material targetMat)
-    {
-        var renderers = gameObject.GetComponents<Renderer>();
-        foreach (var renderer in renderers)
+        private void RecursivelySwitch(GameObject gameObject, string name, Material targetMat)
         {
-            foreach (var material in renderer.materials)
+            var renderers = gameObject.GetComponents<Renderer>();
+            foreach (var renderer in renderers)
             {
-                // IVSwiftLogger.Instance.LogInfo($"Attempting to see if I should switch {material.name} to {targetMat.name}, the name I am looking for is {name}");
-                if (material.name.Replace(" (Clone)", "").Replace(" (Instance)", "") != name) continue;
-                // IVSwiftLogger.Instance.LogInfo("Switched!");
-                material.CopyPropertiesFromMaterial(targetMat);
+                foreach (var material in renderer.materials)
+                {
+                    // IVSwiftLogger.Instance.LogInfo($"Attempting to see if I should switch {material.name} to {targetMat.name}, the name I am looking for is {name}");
+                    if (material.name.Replace(" (Clone)", "").Replace(" (Instance)", "") != name) continue;
+                    // IVSwiftLogger.Instance.LogInfo("Switched!");
+                    material.CopyPropertiesFromMaterial(targetMat);
+                }
             }
-        }
-        foreach (Transform child in gameObject.transform)
-        {
-            var o = child.gameObject;
-            RecursivelySwitch(o, name, targetMat);
+            foreach (Transform child in gameObject.transform)
+            {
+                var o = child.gameObject;
+                RecursivelySwitch(o, name, targetMat);
+            }
         }
     }
 }

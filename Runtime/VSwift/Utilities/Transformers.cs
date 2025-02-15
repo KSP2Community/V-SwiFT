@@ -1,24 +1,28 @@
-﻿using VSwift.Modules.Logging;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using VSwift.Modules.Logging;
 using VSwift.Modules.Transformers;
 
-namespace VSwift.Utilities;
-
-public static class Transformers
+namespace VSwift.Utilities
 {
-    private static readonly Dictionary<string, Type> TransformerTypes;
-
-    static Transformers()
+    public static class Transformers
     {
-        TransformerTypes = [];
-        foreach (var type in AppDomain.CurrentDomain.GetAssemblies().SelectMany(assembly => assembly.GetTypes()))
+        private static readonly Dictionary<string, Type> TransformerTypes;
+
+        static Transformers()
         {
-            var attr = type.GetCustomAttributes(typeof(Transformer), false).FirstOrDefault();
-            if (attr is Transformer transformer)
+            TransformerTypes = new Dictionary<string, Type> { };
+            foreach (var type in AppDomain.CurrentDomain.GetAssemblies().SelectMany(assembly => assembly.GetTypes()))
             {
-                TransformerTypes[transformer.TransformerName] = type;
+                var attr = type.GetCustomAttributes(typeof(Transformer), false).FirstOrDefault();
+                if (attr is Transformer transformer)
+                {
+                    TransformerTypes[transformer.TransformerName] = type;
+                }
             }
         }
+        internal static bool TryGetTransformerByName(string name, out Type adapterType) =>
+            TransformerTypes.TryGetValue(name, out adapterType);
     }
-    internal static bool TryGetTransformerByName(string name, out Type adapterType) =>
-        TransformerTypes.TryGetValue(name, out adapterType);
 }

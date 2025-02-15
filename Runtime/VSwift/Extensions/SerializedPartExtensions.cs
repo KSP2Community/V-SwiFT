@@ -1,40 +1,36 @@
-﻿using System.Reflection;
+﻿using System.Collections.Generic;
+using System.Reflection;
 using JetBrains.Annotations;
 using KSP.Sim;
 using Newtonsoft.Json.Linq;
 using VSwift.Modules.Data;
 
-namespace VSwift.Extensions;
-
-public static class SerializedPartExtensions
+namespace VSwift.Extensions
 {
-    private static readonly FieldInfo FieldInfo = typeof(SerializedPart).GetField("partSwitchOverrides");
-    public static void SetPartSwitchOverride(this SerializedPart part, Dictionary<string, Dictionary<string, (string savedType, JToken savedData)>> data)
+    public static class SerializedPartExtensions
     {
-        FieldInfo.SetValue(part, data);
-    }
-
-    [CanBeNull]
-    public static Dictionary<string, Dictionary<string, (string savedType, JToken savedData)>> GetPartSwitchOverride(
-        this SerializedPart part)
-    {
-        return FieldInfo.GetValue(part) as Dictionary<string, Dictionary<string, (string savedType, JToken savedData)>>;
-    }
-
-
-    [CanBeNull]
-    public static string GetCurrentVariantNameString(this SerializedPart part)
-    {
-        foreach (var module in part.PartModulesState)
+        public static void SetPartSwitchOverride(this SerializedPart part, Dictionary<string, Dictionary<string, (string savedType, JToken savedData)>> data)
         {
-            foreach (var datum in module.ModuleData)
+            part.PartSwitchOverrides = data;
+        }
+    
+        public static Dictionary<string, Dictionary<string, (string savedType, JToken savedData)>>? GetPartSwitchOverride(
+            this SerializedPart part) => part.PartSwitchOverrides;
+
+
+        public static string? GetCurrentVariantNameString(this SerializedPart part)
+        {
+            foreach (var module in part.PartModulesState)
             {
-                if (datum.DataObject is Data_PartSwitch dataPartSwitch)
+                foreach (var datum in module.ModuleData)
                 {
-                    return string.Join('+', dataPartSwitch.ActiveVariants);
+                    if (datum.DataObject is Data_PartSwitch dataPartSwitch)
+                    {
+                        return string.Join('+', dataPartSwitch.ActiveVariants);
+                    }
                 }
             }
+            return null;
         }
-        return null;
     }
 }

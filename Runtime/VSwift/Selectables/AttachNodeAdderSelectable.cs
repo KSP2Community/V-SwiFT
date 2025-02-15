@@ -1,4 +1,5 @@
-﻿using KSP.Sim.Definitions;
+﻿using System.Collections.Generic;
+using KSP.Sim.Definitions;
 using Newtonsoft.Json.Linq;
 using PatchManager.Parts.Selectables;
 using PatchManager.SassyPatching;
@@ -8,94 +9,95 @@ using PatchManager.SassyPatching.Selectables;
 using VSwift.Attributes;
 using VSwift.Modules.Transformers;
 
-namespace VSwift.Selectables;
+namespace VSwift.Selectables
+{
+    [TransformerAdapter(typeof(AttachNodeAdder))]
+    public sealed class AttachNodeAdderSelectable : BaseSelectable
+    {/// <summary>
+        /// The serialized data for this selectable
+        /// </summary>
+        public readonly JObject SerializedData;
 
-[TransformerAdapter(typeof(AttachNodeAdder))]
-public sealed class AttachNodeAdderSelectable : BaseSelectable
-{/// <summary>
-    /// The serialized data for this selectable
-    /// </summary>
-    public readonly JObject SerializedData;
-
-    /// <summary>
-    /// The part selectable that owns this selectable
-    /// </summary>
-    public readonly PartSelectable Selectable;
-    public AttachNodeAdderSelectable(JObject transformerData, VariantSelectable variantSelectable)
-    {
+        /// <summary>
+        /// The part selectable that owns this selectable
+        /// </summary>
+        public readonly PartSelectable Selectable;
+        public AttachNodeAdderSelectable(JObject transformerData, VariantSelectable variantSelectable)
+        {
         
-        SerializedData = transformerData;
-        Name = "AttachNodeAdder";
-        Selectable = variantSelectable.PartSelectable;
-        ElementType = "AttachNodeAdder";
-        Classes = [];
-        Children = [];
-        foreach (var field in SerializedData)
-        {
-            Classes.Add(field.Key);
-            if (field.Value!.Type == JTokenType.Object)
+            SerializedData = transformerData;
+            Name = "AttachNodeAdder";
+            Selectable = variantSelectable.PartSelectable;
+            ElementType = "AttachNodeAdder";
+            Classes = new List<string> { };
+            Children = new List<ISelectable> { };
+            foreach (var field in SerializedData)
             {
-                Children.Add(new JTokenSelectable(Selectable.SetModified, field.Value, field.Key, field.Key));
+                Classes.Add(field.Key);
+                if (field.Value!.Type == JTokenType.Object)
+                {
+                    Children.Add(new JTokenSelectable(Selectable.SetModified, field.Value, field.Key, field.Key));
+                }
+            }
+            foreach (var jToken in (JArray)SerializedData["Nodes"]!)
+            {
+                var mode = (JObject)jToken;
+                Classes.Add(mode["nodeID"]!.Value<string>());
+                Children.Add(new JTokenSelectable(Selectable.SetModified,mode,m => m["nodeID"].Value<string>(),"attach_node"));
             }
         }
-        foreach (var jToken in (JArray)SerializedData["Nodes"]!)
-        {
-            var mode = (JObject)jToken;
-            Classes.Add(mode["nodeID"]!.Value<string>());
-            Children.Add(new JTokenSelectable(Selectable.SetModified,mode,m => m["nodeID"].Value<string>(),"attach_node"));
-        }
-    }
 
-    public override bool MatchesClass(string @class, out DataValue classValue)
-    {
-        if (SerializedData.TryGetValue(@class, out var value))
+        public override bool MatchesClass(string @class, out DataValue classValue)
         {
-            classValue = DataValue.FromJToken(value);
-            return true;
-        }
-
-        foreach (var jToken in (JArray)SerializedData["Nodes"])
-        {
-            var mode = (JObject)jToken;
-            if (mode["nodeID"].Value<string>() != @class)
+            if (SerializedData.TryGetValue(@class, out var value))
             {
-                continue;
+                classValue = DataValue.FromJToken(value);
+                return true;
             }
 
-            classValue = DataValue.FromJToken(mode);
-            return true;
+            foreach (var jToken in (JArray)SerializedData["Nodes"])
+            {
+                var mode = (JObject)jToken;
+                if (mode["nodeID"].Value<string>() != @class)
+                {
+                    continue;
+                }
+
+                classValue = DataValue.FromJToken(mode);
+                return true;
+            }
+
+            classValue = DataValue.Null;
+            return false;
         }
 
-        classValue = DataValue.Null;
-        return false;
-    }
+        public override bool IsSameAs(ISelectable other)=>
+            (other is AttachNodeAdderSelectable dataEngineSelectable) &&
+            SerializedData == dataEngineSelectable.SerializedData;
 
-    public override bool IsSameAs(ISelectable other)=>
-        (other is AttachNodeAdderSelectable dataEngineSelectable) &&
-        SerializedData == dataEngineSelectable.SerializedData;
+        public override IModifiable OpenModification() => new JTokenModifiable(SerializedData, Selectable.SetModified);
 
-    public override IModifiable OpenModification() => new JTokenModifiable(SerializedData, Selectable.SetModified);
-
-    public override ISelectable AddElement(string elementType)
-    {
-        var engineModeData = new AttachNodeDefinition()
+        public override ISelectable AddElement(string elementType)
         {
-            nodeID = elementType
-        };
-        var json = JObject.FromObject(engineModeData);
-        ((JArray)SerializedData["Nodes"]!).Add(json);
-        var selectable =  new JTokenSelectable(Selectable.SetModified, json, mode => mode["nodeID"].Value<string>(),
-            "attach_node");
-        Children.Add(selectable);
-        return selectable;
+            var engineModeData = new AttachNodeDefinition()
+            {
+                nodeID = elementType
+            };
+            var json = JObject.FromObject(engineModeData);
+            ((JArray)SerializedData["Nodes"]!).Add(json);
+            var selectable =  new JTokenSelectable(Selectable.SetModified, json, mode => mode["nodeID"].Value<string>(),
+                "attach_node");
+            Children.Add(selectable);
+            return selectable;
+        }
+
+        public override string Serialize() => SerializedData.ToString();
+
+        public override DataValue GetValue() => DataValue.FromJToken(SerializedData);
+
+        public override List<ISelectable> Children { get; }
+        public override string Name { get; }
+        public override List<string> Classes { get; }
+        public override string ElementType { get; }
     }
-
-    public override string Serialize() => SerializedData.ToString();
-
-    public override DataValue GetValue() => DataValue.FromJToken(SerializedData);
-
-    public override List<ISelectable> Children { get; }
-    public override string Name { get; }
-    public override List<string> Classes { get; }
-    public override string ElementType { get; }
 }

@@ -2,24 +2,25 @@ using JetBrains.Annotations;
 using KSP.Sim.Definitions;
 using VSwift.Modules.Data;
 
-namespace VSwift.Extensions;
-
-public static class PartDefinitionExtensions
+namespace VSwift.Extensions
 {
-    [CanBeNull]
-    public static string GetCurrentVariantNameString(this PartDefinition part)
+    public static class PartDefinitionExtensions
     {
-        
-        foreach (var module in part.Modules)
+        [CanBeNull]
+        public static string GetCurrentVariantNameString(this PartDefinition part)
         {
-            foreach (var datum in module.ModuleData)
+        
+            foreach (var module in part.Modules)
             {
-                if (datum.DataObject is Data_PartSwitch dataPartSwitch)
+                foreach (var datum in module.ModuleData)
                 {
-                    return string.Join('+', dataPartSwitch.ActiveVariants);
+                    if (datum.DataObject is Data_PartSwitch dataPartSwitch)
+                    {
+                        return string.Join('+', dataPartSwitch.ActiveVariants);
+                    }
                 }
             }
+            return null;
         }
-        return null;
     }
 }

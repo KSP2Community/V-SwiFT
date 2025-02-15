@@ -1,19 +1,17 @@
-﻿using KSP.IO;
+﻿using System.Collections.Generic;
+using KSP.IO;
 using KSP.Sim.Definitions;
 using KSP.Sim.ResourceSystem;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace VSwift.Modules.InformationLoaders;
-
-public class ResourceContainerLoader : IInformationLoader
+namespace VSwift.Modules.InformationLoaders
 {
-    public void LoadInformationInto(PartData partData, JToken storedInformation)
+    public class ResourceContainerLoader : IInformationLoader
     {
-        partData.resourceContainers =
-        [
-            ..partData.resourceContainers, 
-            ..IOProvider.FromJson<List<ContainedResourceDefinition>>(storedInformation.ToString(Formatting.None))
-        ];
+        public void LoadInformationInto(PartData partData, JToken storedInformation)
+        {
+            partData.resourceContainers.AddRange(IOProvider.FromJson<List<ContainedResourceDefinition>>(storedInformation.ToString(Formatting.None)));
+        }
     }
 }

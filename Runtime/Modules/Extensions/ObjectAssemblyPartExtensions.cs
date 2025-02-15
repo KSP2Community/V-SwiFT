@@ -1,27 +1,33 @@
-﻿using HoudiniEngineUnity;
-using KSP.OAB;
+﻿using KSP.OAB;
 using UnityEngine;
 
-namespace VSwift.Modules.Extensions;
-
-public static class ObjectAssemblyPartExtensions
+namespace VSwift.Modules.Extensions
 {
-    public static void FixedSetNodeLocalPosition(this IObjectAssemblyPart objectAssemblyPart, IObjectAssemblyPartNode node, Vector3 newLocalPosition)
+    public static class ObjectAssemblyPartExtensions
     {
-        var nodeTransform = node.NodeTransform;
-        var vector = ((Vector3.Dot(newLocalPosition, Vector3.one) > 0f) ? (newLocalPosition - nodeTransform.localPosition) : (nodeTransform.localPosition - newLocalPosition));
-        nodeTransform.localPosition = newLocalPosition;
-        if (node.ConnectedPart == null) return;
-        var num = Mathf.Sign(Vector3.Dot(node.ConnectedPart.WorldPosition - objectAssemblyPart.WorldPosition, objectAssemblyPart.WorldPosition));
-        var partTransform = node.ConnectedPart.PartTransform;
-        var vector2 = partTransform.rotation * partTransform.TransformVector(vector);
-        if (node.ConnectionIsParent)
+        public static void FixedSetNodeLocalPosition(this IObjectAssemblyPart objectAssemblyPart, IObjectAssemblyPartNode node, Vector3 newLocalPosition)
         {
-            objectAssemblyPart.WorldPosition += vector2.SwapYAndZ() * num;
+            var nodeTransform = node.NodeTransform;
+            var vector = ((Vector3.Dot(newLocalPosition, Vector3.one) > 0f) ? (newLocalPosition - nodeTransform.localPosition) : (nodeTransform.localPosition - newLocalPosition));
+            nodeTransform.localPosition = newLocalPosition;
+            if (node.ConnectedPart == null) return;
+        
+            var num = Mathf.Sign(Vector3.Dot(node.ConnectedPart.WorldPosition - objectAssemblyPart.WorldPosition, objectAssemblyPart.WorldPosition));
+            var partTransform = node.ConnectedPart.PartTransform;
+            var transformVector = partTransform.rotation * partTransform.TransformVector(vector);
+            if (node.ConnectionIsParent)
+            {
+                objectAssemblyPart.WorldPosition += transformVector.SwapYAndZ() * num;
+            }
+            else
+            {
+                node.ConnectedPart.WorldPosition -= transformVector.SwapYAndZ() * num;
+            }
         }
-        else
+
+        private static Vector3 SwapYAndZ(this Vector3 toSwap)
         {
-            node.ConnectedPart.WorldPosition -= vector2.SwapYAndZ() * num;
+            return new Vector3(toSwap.x, toSwap.z, toSwap.y);
         }
     }
 }

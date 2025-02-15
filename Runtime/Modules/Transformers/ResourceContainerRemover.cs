@@ -1,4 +1,7 @@
-﻿using KSP.Game;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using KSP.Game;
 using KSP.IO;
 using KSP.Modules;
 using KSP.OAB;
@@ -9,64 +12,66 @@ using VSwift.Modules.InformationLoaders;
 using VSwift.Modules.Logging;
 using VSwift.Modules.Reverters;
 
-namespace VSwift.Modules.Transformers;
-[Transformer(nameof(ResourceContainerRemover))]
-public class ResourceContainerRemover : ITransformer
+namespace VSwift.Modules.Transformers
 {
-    public List<string> Containers = [];
-    public IReverter? Reverter => ResourceContainerReverter.Instance;
-    public bool SavesInformation => true;
-    public bool VisualizesInformation => false;
-
-    public void ApplyInFlight(Module_PartSwitch partSwitch)
+    [Transformer(nameof(ResourceContainerRemover))]
+    public class ResourceContainerRemover : ITransformer
     {
-    }
+        public List<string> Containers = new() { };
+        public IReverter? Reverter => ResourceContainerReverter.Instance;
+        public bool SavesInformation => true;
+        public bool VisualizesInformation => false;
 
-    public void ApplyInOab(Module_PartSwitch partSwitch)
-    {
-        var oabPart = (ObjectAssemblyPart)partSwitch.OABPart;
-        // var allContainers =  oabPart.Containers.Cast<ResourceContainer>().Select(container =>
-        //     container.Where(id =>
-        //         Containers.Select(GameManager.Instance.Game.ResourceDefinitionDatabase.GetResourceIDFromName)
-        //             .All(id2 => id2 != id)).ToList()).ToList();
-        List<ResourceContainer> newContainers = [];
-        foreach (var container in oabPart.Containers)
+        public void ApplyInFlight(Module_PartSwitch partSwitch)
         {
-            var curContainer = container as ResourceContainer;
-            List<ContainedResourceDefinition> newDefinitions = [];
-            for (var internalIndex = 0; internalIndex < curContainer!._resourceIDMap.Count; internalIndex++)
-            {
-                var resourceDef = curContainer._resourceIDMap[internalIndex];
-                if (!Containers.Any(x => GameManager.Instance.Game.ResourceDefinitionDatabase.GetResourceIDFromName(x).Equals(resourceDef)))
-                {
-                    newDefinitions.Add(new ContainedResourceDefinition(new ContainedResourceData
-                    {
-                        IsPartOfRecipe = false,
-                        ResourceID = resourceDef,
-                        CapacityUnits = curContainer._capacityUnitsLookup[internalIndex],
-                        StoredUnits = curContainer._storedUnitsLookup[internalIndex]
-                    }, GameManager.Instance.Game.ResourceDefinitionDatabase));
-                }
-            }
-            if (newDefinitions.Count < 0) continue;
-            var newContainer = new ResourceContainer(GameManager.Instance.Game.ResourceDefinitionDatabase,newDefinitions);
-            newContainer.FreezeDefinitions();
-            newContainers.Add(newContainer);
         }
 
-        oabPart.Containers = newContainers.ToArray();
-        if (!oabPart.TryGetModule(typeof(Module_ResourceCapacities), out var module)) return;
-        var moduleResourceCapacities = (Module_ResourceCapacities)module;
-        moduleResourceCapacities.OnShutdown();
-        moduleResourceCapacities._valueChangeHandlers.Clear();
-        moduleResourceCapacities.dataResourceCapacities.RebuildDataContext();
-        moduleResourceCapacities.OnInitialize();
-    }
+        public void ApplyInOab(Module_PartSwitch partSwitch)
+        {
+            var oabPart = (ObjectAssemblyPart)partSwitch.OABPart;
+            // var allContainers =  oabPart.Containers.Cast<ResourceContainer>().Select(container =>
+            //     container.Where(id =>
+            //         Containers.Select(GameManager.Instance.Game.ResourceDefinitionDatabase.GetResourceIDFromName)
+            //             .All(id2 => id2 != id)).ToList()).ToList();
+            List<ResourceContainer> newContainers = new() { };
+            foreach (var container in oabPart.Containers)
+            {
+                var curContainer = container as ResourceContainer;
+                List<ContainedResourceDefinition> newDefinitions = new() { };
+                for (var internalIndex = 0; internalIndex < curContainer!.ResourceIDMap.Count; internalIndex++)
+                {
+                    var resourceDef = curContainer.ResourceIDMap[internalIndex];
+                    if (!Containers.Any(x => GameManager.Instance.Game.ResourceDefinitionDatabase.GetResourceIDFromName(x).Equals(resourceDef)))
+                    {
+                        newDefinitions.Add(new ContainedResourceDefinition(new ContainedResourceData
+                        {
+                            IsPartOfRecipe = false,
+                            ResourceID = resourceDef,
+                            CapacityUnits = curContainer.CapacityUnitsLookup[internalIndex],
+                            StoredUnits = curContainer.StoredUnitsLookup[internalIndex]
+                        }, GameManager.Instance.Game.ResourceDefinitionDatabase));
+                    }
+                }
+                if (newDefinitions.Count < 0) continue;
+                var newContainer = new ResourceContainer(GameManager.Instance.Game.ResourceDefinitionDatabase,newDefinitions);
+                newContainer.FreezeDefinitions();
+                newContainers.Add(newContainer);
+            }
 
-    public void ApplyCommon(Module_PartSwitch partSwitch)
-    {
-    }
+            oabPart.Containers = newContainers.ToArray();
+            if (!oabPart.TryGetModule(typeof(Module_ResourceCapacities), out var module)) return;
+            var moduleResourceCapacities = (Module_ResourceCapacities)module;
+            moduleResourceCapacities.Shutdown();
+            moduleResourceCapacities.ValueChangeHandlers.Clear();
+            moduleResourceCapacities.DataResourceCapacities.RebuildDataContext();
+            moduleResourceCapacities.Initialize();
+        }
 
-    public (Type savedType, JToken savedValue) SaveInformation() =>
-        (typeof(ResourceContainerRemoveLoader), JToken.FromObject(Containers));
+        public void ApplyCommon(Module_PartSwitch partSwitch)
+        {
+        }
+
+        public (Type savedType, JToken savedValue) SaveInformation() =>
+            (typeof(ResourceContainerRemoveLoader), JToken.FromObject(Containers));
+    }
 }

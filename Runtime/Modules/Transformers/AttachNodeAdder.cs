@@ -1,4 +1,6 @@
-﻿using JetBrains.Annotations;
+﻿using System.Collections.Generic;
+using System.Linq;
+using JetBrains.Annotations;
 using KSP.OAB;
 using KSP.Sim;
 using KSP.Sim.Definitions;
@@ -8,47 +10,48 @@ using VSwift.Modules.Behaviours;
 using VSwift.Modules.Logging;
 using VSwift.Modules.Reverters;
 
-namespace VSwift.Modules.Transformers;
-
-[Transformer(nameof(AttachNodeAdder))]
-public class AttachNodeAdder : ITransformer
+namespace VSwift.Modules.Transformers
 {
-    [UsedImplicitly] public List<AttachNodeDefinition> Nodes = [];
-
-    [JsonIgnore] private IReverter? _reverter;
-    [JsonIgnore] public IReverter? Reverter => _reverter ??= new DynamicAttachNodeReverter(Nodes.Select(x => x.nodeID).ToList());
-    public bool SavesInformation => false;
-    public bool VisualizesInformation => false;
-
-    public void ApplyInFlight(Module_PartSwitch partSwitch)
+    [Transformer(nameof(AttachNodeAdder))]
+    public class AttachNodeAdder : ITransformer
     {
-    }
+        [UsedImplicitly] public List<AttachNodeDefinition> Nodes = new() { };
 
-    public void ApplyInOab(Module_PartSwitch partSwitch)
-    {
-        foreach (var definition in Nodes)
+        [JsonIgnore] private IReverter? _reverter;
+        [JsonIgnore] public IReverter? Reverter => _reverter ??= new DynamicAttachNodeReverter(Nodes.Select(x => x.nodeID).ToList());
+        public bool SavesInformation => false;
+        public bool VisualizesInformation => false;
+
+        public void ApplyInFlight(Module_PartSwitch partSwitch)
         {
-            if (partSwitch.OABPart.FindNodeWithTag(definition.nodeID) is {} node)
+        }
+
+        public void ApplyInOab(Module_PartSwitch partSwitch)
+        {
+            foreach (var definition in Nodes)
             {
-                partSwitch.OABPart.SetNodeLocalPosition(node, definition.position);
-                partSwitch.OABPart.SetNodeLocalScale(node, definition.size);
-            }
-            else
-            {
-                partSwitch.OABPart.AddDynamicNode(partSwitch.OABPart,
-                    new ObjectAssemblyAvailablePartNode(definition.size,
-                        definition.position,
-                        Quaternion.LookRotation(definition.orientation,Vector3.up),
-                        definition.nodeID,
-                        null,
-                        definition.size,
-                        AttachNodeType.Stack,
-                        true));
+                if (partSwitch.OABPart.FindNodeWithTag(definition.nodeID) is {} node)
+                {
+                    partSwitch.OABPart.SetNodeLocalPosition(node, definition.position);
+                    partSwitch.OABPart.SetNodeLocalScale(node, definition.size);
+                }
+                else
+                {
+                    partSwitch.OABPart.AddDynamicNode(partSwitch.OABPart,
+                        new ObjectAssemblyAvailablePartNode(definition.size,
+                            definition.position,
+                            Quaternion.LookRotation(definition.orientation,Vector3.up),
+                            definition.nodeID,
+                            null,
+                            definition.size,
+                            AttachNodeType.Stack,
+                            true));
+                }
             }
         }
-    }
 
-    public void ApplyCommon(Module_PartSwitch partSwitch)
-    {
+        public void ApplyCommon(Module_PartSwitch partSwitch)
+        {
+        }
     }
 }

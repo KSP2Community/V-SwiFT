@@ -1,34 +1,36 @@
-﻿using JetBrains.Annotations;
+﻿using System.Collections.Generic;
+using JetBrains.Annotations;
 using VSwift.Modules.Behaviours;
 using VSwift.Modules.Extensions;
 using VSwift.Modules.Reverters;
 
-namespace VSwift.Modules.Transformers;
-
-[Transformer(nameof(AttachNodeMover))]
-public class AttachNodeMover : ITransformer
+namespace VSwift.Modules.Transformers
 {
-    [UsedImplicitly]
-    public Dictionary<string, Vector3d> MovedNodes = [];
-    public IReverter? Reverter => PredefinedNodeReverter.Instance;
-    public bool SavesInformation => false;
-    public bool VisualizesInformation => false;
-    public void ApplyInFlight(Module_PartSwitch partSwitch)
+    [Transformer(nameof(AttachNodeMover))]
+    public class AttachNodeMover : ITransformer
     {
-    }
-
-    public void ApplyInOab(Module_PartSwitch partSwitch)
-    {
-        foreach (var (node, pos) in MovedNodes)
+        [UsedImplicitly]
+        public Dictionary<string, Vector3d> MovedNodes = new() { };
+        public IReverter? Reverter => PredefinedNodeReverter.Instance;
+        public bool SavesInformation => false;
+        public bool VisualizesInformation => false;
+        public void ApplyInFlight(Module_PartSwitch partSwitch)
         {
-            if (partSwitch.OABPart.FindNodeWithTag(node) is { } actualNode)
-            {
-                partSwitch.OABPart.FixedSetNodeLocalPosition(actualNode, pos);
-            } 
         }
-    }
 
-    public void ApplyCommon(Module_PartSwitch partSwitch)
-    {
+        public void ApplyInOab(Module_PartSwitch partSwitch)
+        {
+            foreach (var (node, pos) in MovedNodes)
+            {
+                if (partSwitch.OABPart.FindNodeWithTag(node) is { } actualNode)
+                {
+                    partSwitch.OABPart.FixedSetNodeLocalPosition(actualNode, pos);
+                } 
+            }
+        }
+
+        public void ApplyCommon(Module_PartSwitch partSwitch)
+        {
+        }
     }
 }

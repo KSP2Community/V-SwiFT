@@ -1,17 +1,16 @@
-﻿namespace VSwift.Modules.Logging;
-
-public interface IVSwiftLogger
+﻿namespace VSwift.Modules.Logging
 {
+    public interface IVSwiftLogger
+    {
+        public static IVSwiftLogger Instance { get; set; } = null!;
 
+        public void LogDebug(object debug);
 
-    public static IVSwiftLogger Instance { get; set; } = null!;
+        public void LogInfo(object info);
 
-    public void LogDebug(object debug);
+        public void LogWarning(object warning);
 
-    public void LogInfo(object info);
+        public void LogError(object error);
 
-    public void LogWarning(object warning);
-
-    public void LogError(object error);
-
+    }
 }

@@ -1,26 +1,34 @@
-﻿using VSwift.Modules.Behaviours;
+﻿using System.Collections.Generic;
+using VSwift.Modules.Behaviours;
 using VSwift.Modules.Logging;
 
-namespace VSwift.Modules.Reverters;
-
-public class DynamicAttachNodeReverter(List<string> dynamicNodeNames) : IReverter
+namespace VSwift.Modules.Reverters
 {
-    public object? Store(Module_PartSwitch partSwitch)
+    public class DynamicAttachNodeReverter : IReverter
     {
-        return null;
-    }
-
-    public void Revert(Module_PartSwitch partSwitch, object? data, bool isStartingReset)
-    {
-        if (isStartingReset) return;
-        foreach (var nodeName in dynamicNodeNames)
+        public List<string> DynamicNodeNames;
+        public DynamicAttachNodeReverter(List<string> dynamicNodeNames)
         {
-            if (partSwitch.OABPart.FindNodeWithTag(nodeName) is {} node)
+            DynamicNodeNames = dynamicNodeNames;
+        }
+        
+        public object? Store(Module_PartSwitch partSwitch)
+        {
+            return null;
+        }
+
+        public void Revert(Module_PartSwitch partSwitch, object? data, bool isStartingReset)
+        {
+            if (isStartingReset) return;
+            foreach (var nodeName in DynamicNodeNames)
             {
-                partSwitch.OABPart.RemoveDynamicNode(node);
+                if (partSwitch.OABPart.FindNodeWithTag(nodeName) is {} node)
+                {
+                    partSwitch.OABPart.RemoveDynamicNode(node);
+                }
             }
         }
-    }
 
-    public bool RequiresInVariantSet => true;
+        public bool RequiresInVariantSet => true;
+    }
 }
