@@ -1,6 +1,7 @@
 using System.IO;
 using System.Reflection;
 using JetBrains.Annotations;
+using KSP.Game;
 using Redux.ExtraModTypes;
 using SpaceWarp;
 using SpaceWarp.API.Mods;
@@ -45,16 +46,13 @@ namespace VSwift
         public override void OnInitialized()
         {
             Instance = this;
-
-            // Load all the other assemblies used by this mod
-            LoadAssemblies();
-
-            // var partSwitchPopoutWindowControllerUxml = AssetManager.GetAsset<VisualTreeAsset>(
-            //     $"{ModGuid}/" +
-            //     "VSwift_ui/" +
-            //     "ui/partswitchpopout/partswitchpopout.uxml"
-            // );
             
+            var assets = GameManager.Instance.Assets;
+            
+            // Load the popout window controller uxml
+            var popoutWindowControllerUxmlHandle = assets.LoadAssetAsync<VisualTreeAsset>("vs/part_popout");
+            popoutWindowControllerUxmlHandle.WaitForCompletion();
+            var popoutWindowControllerUxml = popoutWindowControllerUxmlHandle.Result;
             
 
             var windowOptions = new WindowOptions
@@ -70,26 +68,29 @@ namespace VSwift
                 }
             };
 
-            //var popOutWindow = Window.Create(windowOptions, partSwitchPopoutWindowControllerUxml);
-            //var popoutWindowController = popOutWindow.gameObject.AddComponent<PartSwitchPopoutWindowController>();
+            var popOutWindow = Window.Create(windowOptions, popoutWindowControllerUxml);
+            var popoutWindowController = popOutWindow.gameObject.AddComponent<PartSwitchPopoutWindowController>();
             
             // TODO: Refactor vswift ui loading to use addressables
+            
+            var partStatisticHandle = assets.LoadAssetAsync<VisualTreeAsset>("vs/part_statistic");
+            partStatisticHandle.WaitForCompletion();
+            var partStatistic = partStatisticHandle.Result;
+            VSwiftUI.StatBlockContainer = partStatistic;
+            
+            var variantNameHandle =assets.LoadAssetAsync<VisualTreeAsset>("vs/ps_variant_name");
+            variantNameHandle.WaitForCompletion();
+            var variantName = variantNameHandle.Result;
+            PartSwitchPopoutWindowController.VariantNameContainer = variantName;
+            
+            var requiredTechHandle = assets.LoadAssetAsync<VisualTreeAsset>("vs/required_tech");
+            requiredTechHandle.WaitForCompletion();
+            var requiredTech = requiredTechHandle.Result;
+            PartSwitchPopoutWindowController.RequirementContainer = requiredTech;
         }
 
         public override void OnPostInitialized()
         {
-        }
-
-        /// <summary>
-        /// Loads all the assemblies for the mod.
-        /// </summary>
-        private static void LoadAssemblies()
-        {
-            // Load the Unity project assembly
-            var currentFolder = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory!.FullName;
-            var unityAssembly = Assembly.LoadFrom(Path.Combine(currentFolder, "VSwift.Unity.dll"));
-            // Register any custom UI controls from the loaded assembly
-            CustomControls.RegisterFromAssembly(unityAssembly);
         }
     }
 }

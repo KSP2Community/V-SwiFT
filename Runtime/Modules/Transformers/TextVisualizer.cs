@@ -31,7 +31,7 @@ namespace VSwift.Modules.Transformers
 
         public VisualElement? VisualizeInformation(Module_PartSwitch modulePartSwitch)
         {
-            return IVSwiftUI.Instance.CreateStatBlock(new LocalizedString(TitleKey), new LocalizedString(DescriptionKey));
+            return IVSwiftUI.Instance.CreateStatBlock(new LocalizedString(TitleKey).ToString() ?? TitleKey, new LocalizedString(DescriptionKey).ToString() ?? DescriptionKey);
         }
     }
 }

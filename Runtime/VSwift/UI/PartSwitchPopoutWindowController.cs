@@ -51,22 +51,17 @@ namespace VSwift.UI
             get => _titleLabel.text;
             set => _titleLabel.text = value.ToUpper();
         }
-    
-    
+        
 
-        private static VisualTreeAsset? _variantNameContainer;
-
-        private static VisualTreeAsset VariantNameContainer =>
-            throw new NotImplementedException("Need to refactor to use addressables");
+        internal static VisualTreeAsset VariantNameContainer;
+//            throw new NotImplementedException("Need to refactor to use addressables");
             // _variantNameContainer ??= AssetManager.GetAsset<VisualTreeAsset>(
             //     $"{VSwiftPlugin.ModGuid}/" +
             //     "VSwift_ui/" +
             //     "ui/partswitchpopout/partswitchvariantname.uxml");
     
-        private static VisualTreeAsset? _requirementContainer;
-
-        private static VisualTreeAsset RequirementContainer =>
-            throw new NotImplementedException("Need to refactor to use addressables");
+        internal static VisualTreeAsset RequirementContainer;
+//            throw new NotImplementedException("Need to refactor to use addressables");
             // _requirementContainer ??= AssetManager.GetAsset<VisualTreeAsset>(
             //     $"{VSwiftPlugin.ModGuid}/" +
             //     "VSwift_ui/" +

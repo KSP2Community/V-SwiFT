@@ -1,5 +1,7 @@
 ﻿using System;
 using JetBrains.Annotations;
+using KSP.Assets;
+using KSP.Game;
 using UnityEngine.UIElements;
 using VSwift.Modules.Behaviours;
 using VSwift.Modules.UI;
@@ -14,10 +16,7 @@ namespace VSwift.UI
             PartSwitchPopoutWindowController.ShowFor(modulePartSwitch, variantSet);
         }
 
-        [CanBeNull] private static VisualTreeAsset _statBlockContainer;
-
-        private static VisualTreeAsset StatBlockContainer =>
-            throw new NotImplementedException("Need to refactor to use addressables");
+        internal static VisualTreeAsset StatBlockContainer;
     
         // _statBlockContainer ??= AssetManager.GetAsset<VisualTreeAsset>(
         //     $"{VSwiftPlugin.ModGuid}/" +
