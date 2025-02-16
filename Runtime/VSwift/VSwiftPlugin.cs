@@ -18,27 +18,8 @@ namespace VSwift
 {
     public class VSwiftPlugin : KerbalMod
     {
-        public const string VSWIFT_MIXINS = """
-                                             @mixin ps-pam-override() {
-                                                 PAMModuleVisualsOverride +: [
-                                                     {
-                                                         PartComponentModuleName: PartComponentModule_PartSwitch,
-                                                         ModuleDisplayName: "VSwift/PartSwitch",
-                                                         ShowHeader: true,
-                                                         ShowFooter: false
-                                                     }
-                                                 ];
-                                             }
-
-                                             @mixin part-switch() {
-                                                 +Module_PartSwitch {
-                                                     +Data_PartSwitch {
-                                                         @mixin-slot
-                                                     }
-                                                 }
-                                                 @include ps-pam-override()
-                                             }
-                                             """;
+        private const string VSWIFT_MIXINS = 
+            "@mixin ps-pam-override() {\nPAMModuleVisualsOverride +: [\n{\nPartComponentModuleName: PartComponentModule_PartSwitch,\nModuleDisplayName: \"VSwift/PartSwitch\",\nShowHeader: true,\nShowFooter: false\n}\n];}\n@mixin part-switch() {\n+Module_PartSwitch {\n+Data_PartSwitch {\n@mixin-slot\n}\n}\n@include ps-pam-override()\n}";
             /// Singleton instance of the plugin class
         [PublicAPI] public static VSwiftPlugin Instance { get; set; }
 
