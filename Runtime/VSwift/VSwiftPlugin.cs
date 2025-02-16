@@ -18,8 +18,28 @@ namespace VSwift
 {
     public class VSwiftPlugin : KerbalMod
     {
+        public const string VSWIFT_MIXINS = """
+                                             @mixin ps-pam-override() {
+                                                 PAMModuleVisualsOverride +: [
+                                                     {
+                                                         PartComponentModuleName: PartComponentModule_PartSwitch,
+                                                         ModuleDisplayName: "VSwift/PartSwitch",
+                                                         ShowHeader: true,
+                                                         ShowFooter: false
+                                                     }
+                                                 ];
+                                             }
 
-        /// Singleton instance of the plugin class
+                                             @mixin part-switch() {
+                                                 +Module_PartSwitch {
+                                                     +Data_PartSwitch {
+                                                         @mixin-slot
+                                                     }
+                                                 }
+                                                 @include ps-pam-override()
+                                             }
+                                             """;
+            /// Singleton instance of the plugin class
         [PublicAPI] public static VSwiftPlugin Instance { get; set; }
 
         // AppBar button IDs
@@ -35,7 +55,7 @@ namespace VSwift
         {
             IVSwiftLogger.Instance = new VSwiftReduxLogger(SWLogger);
             IVSwiftUI.Instance = new VSwiftUI();
-            Universe.RegisterAddressablesLibrary("VSwift","mixins", "vs/mixins.patch");
+            Universe.RegisterRawLibrary("VSwift","mixins", VSWIFT_MIXINS);
         }
 
         public override void OnPreInitialized()
