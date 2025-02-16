@@ -2,6 +2,7 @@ using System.IO;
 using System.Reflection;
 using JetBrains.Annotations;
 using KSP.Game;
+using PatchManager.SassyPatching.Execution;
 using Redux.ExtraModTypes;
 using SpaceWarp;
 using SpaceWarp.API.Mods;
@@ -30,10 +31,11 @@ namespace VSwift
         /// Runs on loading of the plugin, loads the VSwift.Modules assembly
         /// VSwift.Modules is in a separate assembly such that it does not have to reference the main assembly
         /// </summary>
-        public VSwiftPlugin()
+        public void Awake()
         {
             IVSwiftLogger.Instance = new VSwiftReduxLogger(SWLogger);
             IVSwiftUI.Instance = new VSwiftUI();
+            Universe.RegisterAddressablesLibrary("VSwift","mixins", "vs/mixins.patch");
         }
 
         public override void OnPreInitialized()
