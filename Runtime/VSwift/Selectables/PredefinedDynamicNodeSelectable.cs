@@ -14,6 +14,11 @@ namespace VSwift.Selectables
     [PublicAPI]
     public sealed class PredefinedDynamicNodeSelectable : BaseSelectable
     {
+        public override bool WasModified => Selectable.WasModified;
+        public override void ClearModified()
+        {
+        }
+
         public JArray Nodes;
         public PartSelectable Selectable;
         public PredefinedDynamicNodeSelectable(JArray predefinedDynamicNodes, PartSelectable partSelectable)
@@ -54,6 +59,7 @@ namespace VSwift.Selectables
 
         public override ISelectable AddElement(string elementType)
         {
+            Selectable.SetModified();
             var engineModeData = new AttachNodeDefinition()
             {
                 nodeID = elementType

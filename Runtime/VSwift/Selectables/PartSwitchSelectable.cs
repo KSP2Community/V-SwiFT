@@ -19,6 +19,10 @@ namespace VSwift.Selectables
         public readonly JObject SerializedData;
 
         public readonly PartSelectable Selectable;
+        public override bool WasModified => Selectable.WasModified;
+        public override void ClearModified()
+        {
+        }
 
         public Dictionary<string, VariantSetSelectable> MatchedClasses;
 
@@ -69,6 +73,7 @@ namespace VSwift.Selectables
 
         public override ISelectable AddElement(string elementType)
         {
+            Selectable.SetModified();
             var obj = new VariantSet
             {
                 VariantSetId = elementType,

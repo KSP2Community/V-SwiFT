@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using LibNoise.Modifiers;
 using Newtonsoft.Json.Linq;
 using PatchManager.Parts.Selectables;
 using PatchManager.SassyPatching;
@@ -71,6 +72,10 @@ namespace VSwift.Selectables
         public override string Serialize() => SetObject.ToString();
 
         public override DataValue GetValue() => DataValue.FromJToken(SetObject);
+        public override bool WasModified => Selectable.WasModified;
+        public override void ClearModified()
+        {
+        }
 
         public override List<ISelectable> Children { get; }
         public override string Name { get; }

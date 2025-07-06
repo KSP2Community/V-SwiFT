@@ -6,6 +6,7 @@ using PatchManager.SassyPatching;
 using PatchManager.SassyPatching.Interfaces;
 using PatchManager.SassyPatching.Modifiables;
 using PatchManager.SassyPatching.Selectables;
+using UnityEngine.UI;
 using VSwift.Attributes;
 using VSwift.Modules.Transformers;
 
@@ -79,6 +80,7 @@ namespace VSwift.Selectables
 
         public override ISelectable AddElement(string elementType)
         {
+            Selectable.SetModified();
             var engineModeData = new AttachNodeDefinition()
             {
                 nodeID = elementType
@@ -94,6 +96,10 @@ namespace VSwift.Selectables
         public override string Serialize() => SerializedData.ToString();
 
         public override DataValue GetValue() => DataValue.FromJToken(SerializedData);
+        public override bool WasModified => Selectable.WasModified;
+        public override void ClearModified()
+        {
+        }
 
         public override List<ISelectable> Children { get; }
         public override string Name { get; }

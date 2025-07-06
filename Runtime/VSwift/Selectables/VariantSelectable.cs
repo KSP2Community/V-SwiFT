@@ -16,6 +16,10 @@ namespace VSwift.Selectables
         public readonly JObject VariantObject;
         public readonly PartSelectable PartSelectable;
         public readonly Dictionary<string, ISelectable> MatchedClasses;
+        public override bool WasModified => PartSelectable.WasModified;
+        public override void ClearModified()
+        {
+        }
 
         public VariantSelectable(JObject variantObject, PartSelectable partSelectable)
         {
@@ -73,6 +77,7 @@ namespace VSwift.Selectables
         {
             if (!Transformers.TryGetTransformerByName(elementType, out var transformerType))
                 throw new ArgumentException($"{elementType} is not a valid transformer type", nameof(elementType));
+            PartSelectable.SetModified();
             var obj = Activator.CreateInstance(transformerType);
             var jObj = new JObject
             {

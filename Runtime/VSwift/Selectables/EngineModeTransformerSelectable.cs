@@ -23,6 +23,11 @@ namespace VSwift.Selectables
         /// The part selectable that owns this selectable
         /// </summary>
         public readonly PartSelectable Selectable;
+        public override bool WasModified => Selectable.WasModified;
+        public override void ClearModified()
+        {
+            Selectable.ClearModified();
+        }
 
         /// <summary>
         /// Initialize the selectable
@@ -111,6 +116,7 @@ namespace VSwift.Selectables
         /// <inheritdoc />
         public override ISelectable AddElement(string elementType)
         {
+            Selectable.SetModified();
             var engineModeData = new Data_Engine.EngineMode()
             {
                 engineID = elementType
