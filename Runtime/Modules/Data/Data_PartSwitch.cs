@@ -27,7 +27,7 @@ namespace VSwift.Modules.Data
     
         // [KSPState] public List<(string, bool)>? OriginalGameObjectStates = null;
 
-        internal override List<OABPartData.PartInfoModuleEntry> GetPartInfoEntries(Type partBehaviourModuleType,
+        public override List<OABPartData.PartInfoModuleEntry> GetPartInfoEntries(Type partBehaviourModuleType,
             List<OABPartData.PartInfoModuleEntry> emptyPartInfoEntryList)
         {
             emptyPartInfoEntryList.Add(
