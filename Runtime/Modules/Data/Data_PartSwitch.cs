@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Castle.Core.Internal;
+using Redux;
 using I2.Loc;
 using KSP.Game;
 using KSP.Sim;
@@ -24,7 +24,7 @@ namespace VSwift.Modules.Data
         [KSPState] public List<string> ActiveVariants = new();
 
         [KSPDefinition] public List<AttachNodeDefinition> PredefinedDynamicNodes = new();
-    
+
         // [KSPState] public List<(string, bool)>? OriginalGameObjectStates = null;
 
         public override List<OABPartData.PartInfoModuleEntry> GetPartInfoEntries(Type partBehaviourModuleType,

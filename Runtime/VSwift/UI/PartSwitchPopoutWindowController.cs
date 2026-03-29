@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Linq;
-using Castle.Core.Internal;
+using Redux;
 using I2.Loc;
-using JetBrains.Annotations;
 using KSP.Game;
 using UnityEngine;
 using UnityEngine.UIElements;
 using VSwift.Modules.Behaviours;
-using VSwift.Modules.Logging;
-using VSwift.Modules.UI;
 using VSwift.Modules.Variants;
 
 namespace VSwift.UI
@@ -45,13 +42,13 @@ namespace VSwift.UI
                 _rootElement.style.display = value ? DisplayStyle.Flex : DisplayStyle.None;
             }
         }
-    
+
         private string PartName
         {
             get => _titleLabel.text;
             set => _titleLabel.text = value.ToUpper();
         }
-        
+
 
         internal static VisualTreeAsset VariantNameContainer;
 //            throw new NotImplementedException("Need to refactor to use addressables");
@@ -59,14 +56,14 @@ namespace VSwift.UI
             //     $"{VSwiftPlugin.ModGuid}/" +
             //     "VSwift_ui/" +
             //     "ui/partswitchpopout/partswitchvariantname.uxml");
-    
+
         internal static VisualTreeAsset RequirementContainer;
 //            throw new NotImplementedException("Need to refactor to use addressables");
             // _requirementContainer ??= AssetManager.GetAsset<VisualTreeAsset>(
             //     $"{VSwiftPlugin.ModGuid}/" +
             //     "VSwift_ui/" +
             //     "ui/partswitchpopout/requiredtechnology.uxml");
-    
+
         /// <summary>
         /// Runs when the window is first created, and every time the window is re-enabled.
         /// </summary>
@@ -94,7 +91,7 @@ namespace VSwift.UI
             _variantSelect.Clear();
             _variantInformation.Clear();
         }
-    
+
         public static void ShowFor(Module_PartSwitch partSwitch, VariantSet variantSet) => Instance.ShowForInternal(partSwitch,variantSet);
 
         private int _variantIndex;
@@ -128,7 +125,7 @@ namespace VSwift.UI
             var instance = VariantNameContainer.CloneTree().Q<VisualElement>("variant-container");
             var variantName = instance.Q<Label>("variant-name");
             var allUnlocked = unlockedTechs.All(x => x.Item2);
-            variantName.text = localizedString; 
+            variantName.text = localizedString;
             if (!hasUnlockRequirements || allUnlocked)
             {
                 instance.Q<Label>("unlockability").RemoveFromHierarchy();
@@ -206,7 +203,7 @@ namespace VSwift.UI
         private void ShowForInternal(Module_PartSwitch partSwitch, VariantSet variantSet)
         {
             ResetWindow();
-            _currentPartSwitchModule = partSwitch; 
+            _currentPartSwitchModule = partSwitch;
             PartName = new LocalizedString($"Parts/Title/{partSwitch.OABPart.Name}");
             for (var i = 0; i < partSwitch.DataPartSwitch!.VariantSets.Count; i++)
             {
@@ -230,7 +227,7 @@ namespace VSwift.UI
 
             IsWindowOpen = true;
         }
-    
+
         private void GenerateInformationFor(Variant selected)
         {
             _variantInformation.Clear();

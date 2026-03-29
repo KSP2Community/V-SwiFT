@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Castle.Core.Internal;
+using Redux;
 using KSP.Game;
 using KSP.IO;
 using KSP.Sim;
@@ -30,7 +30,7 @@ namespace VSwift.Patches
             {
                 return cached;
             }
-        
+
             var newData = originalPartCore.JsonClone().data;
             List<(string, List<(string, IInformationLoader, JToken)>)> toBeDoublySorted = new() { };
             foreach (var (idx,variant) in data)
@@ -61,7 +61,7 @@ namespace VSwift.Patches
                 version = PartCore.PART_SERIALIZATION_VERSION, // Todo replace this with reflection
                 data = newData
             };
-            
+
             if (variantName.IsNullOrEmpty()) return result;
             GameManager.Instance.Game.Parts.PartData[$"{part.partName}+{variantName}"] = result;
             GameManager.Instance.Game.Parts.PartJson[$"{part.partName}+{variantName}"] = IOProvider.ToJson(result);

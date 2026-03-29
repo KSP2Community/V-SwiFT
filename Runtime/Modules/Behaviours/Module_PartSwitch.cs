@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Castle.Core.Internal;
+using Redux;
 using I2.Loc;
 using KSP.Game;
 using KSP.Messages;
@@ -274,7 +274,7 @@ namespace VSwift.Modules.Behaviours
                 }
             }
         }
-    
+
         private void ApplyVariantInFlight(Variant variant)
         {
             foreach (var transformer in variant.Transformers)
