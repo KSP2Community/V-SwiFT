@@ -1,23 +1,28 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using VSwift.Modules.Behaviours;
-using VSwift.Modules.Transformers;
 
 namespace VSwift.Modules.Reverters
 {
     public class MaterialReverter : IReverter
     {
-        private readonly MaterialSwapper _swapper;
+        private readonly Func<GameObject, IEnumerable<Material>> _selector;
 
-        public MaterialReverter(MaterialSwapper swapper)
+        public MaterialReverter(Func<GameObject, IEnumerable<Material>> selector)
         {
-            _swapper = swapper;
+            _selector = selector;
         }
 
         public object? Store(Module_PartSwitch partSwitch)
         {
             var snapshot = new Dictionary<Material, Material>();
-            CaptureMatching(partSwitch.gameObject, _swapper.Swaps.Keys, snapshot);
+            foreach (var material in _selector(partSwitch.gameObject))
+            {
+                if (material == null) continue;
+                if (snapshot.ContainsKey(material)) continue;
+                snapshot[material] = new Material(material);
+            }
             return snapshot;
         }
 
@@ -33,25 +38,5 @@ namespace VSwift.Modules.Reverters
         }
 
         public bool RequiresInVariantSet => false;
-
-        private static void CaptureMatching(GameObject root, ICollection<string> targetNames, Dictionary<Material, Material> snapshot)
-        {
-            foreach (var renderer in root.GetComponents<Renderer>())
-            {
-                foreach (var material in renderer.materials)
-                {
-                    if (material == null) continue;
-                    var name = material.name.Replace(" (Clone)", "").Replace(" (Instance)", "");
-                    if (targetNames.Contains(name))
-                    {
-                        snapshot[material] = new Material(material);
-                    }
-                }
-            }
-            foreach (Transform child in root.transform)
-            {
-                CaptureMatching(child.gameObject, targetNames, snapshot);
-            }
-        }
     }
 }

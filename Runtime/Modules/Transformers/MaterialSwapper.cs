@@ -18,7 +18,7 @@ namespace VSwift.Modules.Transformers
         [JsonIgnore] private Dictionary<string,Material> _material = new() { };
 
         [JsonIgnore] private IReverter? _reverter;
-        [JsonIgnore] public IReverter? Reverter => _reverter ??= new MaterialReverter(this);
+        [JsonIgnore] public IReverter? Reverter => _reverter ??= new MaterialReverter(CollectAffectedMaterials);
         public bool SavesInformation => false;
         public bool VisualizesInformation => true;
 
@@ -84,6 +84,19 @@ namespace VSwift.Modules.Transformers
             {
                 var o = child.gameObject;
                 RecursivelySwitch(o, name, targetMat);
+            }
+        }
+
+        private IEnumerable<Material> CollectAffectedMaterials(GameObject root)
+        {
+            foreach (var renderer in root.GetComponentsInChildren<Renderer>(true))
+            {
+                foreach (var material in renderer.materials)
+                {
+                    if (material == null) continue;
+                    var name = material.name.Replace(" (Clone)", "").Replace(" (Instance)", "");
+                    if (Swaps.ContainsKey(name)) yield return material;
+                }
             }
         }
     }
