@@ -231,12 +231,22 @@ namespace VSwift.Modules.Behaviours
 
         public void QueuePamUpdate()
         {
+            if (gameObject == null || !isActiveAndEnabled || !gameObject.activeInHierarchy)
+            {
+                return;
+            }
+
             StartCoroutine(UpdatePam());
         }
 
         private IEnumerator UpdatePam()
         {
             yield return new WaitForEndOfFrame();
+            if (gameObject == null || !isActiveAndEnabled || !gameObject.activeInHierarchy)
+            {
+                yield break;
+            }
+
             var objectAssemblyPart = (ObjectAssemblyPart)OABPart;
             Game.PartsManager.IsVisible = true;
             Game.PartsManager.PartsList.ScrollToPart(objectAssemblyPart.GlobalId);
@@ -245,23 +255,33 @@ namespace VSwift.Modules.Behaviours
 
         public void QueueUpdateColors()
         {
+            if (gameObject == null || !isActiveAndEnabled || !gameObject.activeInHierarchy)
+            {
+                RefreshColors();
+                return;
+            }
+
             StartCoroutine(UpdateColors());
         }
 
         private IEnumerator UpdateColors()
         {
             yield return new WaitForSeconds(0.5f);
+            RefreshColors();
+        }
+
+        private void RefreshColors()
+        {
             if (PartBackingMode == PartBackingModes.OAB)
             {
-
-                if (OABPart.TryGetModule(out Module_Color moduleColor))
+                if (OABPart != null && OABPart.TryGetModule(out Module_Color moduleColor))
                 {
                     moduleColor.RefreshColors();
                 }
             }
             else
             {
-                if (part.GetModule<Module_Color>() is { } moduleColor)
+                if (part != null && part.GetModule<Module_Color>() is { } moduleColor)
                 {
                     moduleColor.RefreshColors();
                 }
