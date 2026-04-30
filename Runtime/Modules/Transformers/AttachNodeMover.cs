@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
 using VSwift.Modules.Behaviours;
-using VSwift.Modules.Extensions;
 using VSwift.Modules.Reverters;
 
 namespace VSwift.Modules.Transformers
@@ -24,7 +23,7 @@ namespace VSwift.Modules.Transformers
             {
                 if (partSwitch.OABPart.FindNodeWithTag(node) is { } actualNode)
                 {
-                    partSwitch.OABPart.FixedSetNodeLocalPosition(actualNode, pos);
+                    partSwitch.OABPart.SetNodeLocalPosition(actualNode, pos);
                 } 
             }
         }

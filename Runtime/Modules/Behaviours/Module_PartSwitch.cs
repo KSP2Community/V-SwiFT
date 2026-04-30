@@ -59,23 +59,16 @@ namespace VSwift.Modules.Behaviours
             _dataPartSwitch!.VariantSets.Aggregate(0, HandleVariantSetInOab);
             foreach (var predefinedNode in _dataPartSwitch.PredefinedDynamicNodes.Where(predefinedNode => OABPart.FindNodeWithTag(predefinedNode.nodeID) == null))
             {
-                if (OABPart.FindNodeWithTag(predefinedNode.nodeID) is { } node)
-                {
-                    OABPart.FixedSetNodeLocalPosition(node, predefinedNode.position);
-                }
-                else
-                {
-                    OABPart.AddDynamicNode(OABPart, new ObjectAssemblyAvailablePartNode(
-                        predefinedNode.size,
-                        predefinedNode.position,
-                        Quaternion.LookRotation(predefinedNode.orientation, Vector3.up),
-                        predefinedNode.nodeID,
-                        null,
-                        predefinedNode.size,
-                        AttachNodeType.Stack,
-                        true
-                    ));
-                }
+                OABPart.AddDynamicNode(OABPart, new ObjectAssemblyAvailablePartNode(
+                    predefinedNode.size,
+                    predefinedNode.position,
+                    Quaternion.LookRotation(predefinedNode.orientation, Vector3.up),
+                    predefinedNode.nodeID,
+                    null,
+                    predefinedNode.size,
+                    AttachNodeType.Stack,
+                    true
+                ));
             }
             ApplyInOab(true);
         }
