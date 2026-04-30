@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 using UnityEngine;
 using VSwift.Modules.Behaviours;
 using VSwift.Modules.Logging;
@@ -10,8 +11,9 @@ namespace VSwift.Modules.Transformers
     public class TransformActivator : ITransformer
     {
         public List<string> Transforms = new() { };
-    
-        public IReverter? Reverter => TransformReverter.Instance;
+
+        [JsonIgnore] private IReverter? _reverter;
+        [JsonIgnore] public IReverter? Reverter => _reverter ??= new TransformDeactivator(Transforms);
         public bool SavesInformation => false;
         public bool VisualizesInformation => false;
 

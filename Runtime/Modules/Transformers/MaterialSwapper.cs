@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using KSP.Game;
 using KSP.Modules;
+using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using VSwift.Modules.Behaviours;
@@ -14,10 +15,10 @@ namespace VSwift.Modules.Transformers
     public class MaterialSwapper : ITransformer
     {
         public Dictionary<string, string> Swaps = new() { };
-        private Dictionary<string,Material> _material = new() { };
+        [JsonIgnore] private Dictionary<string,Material> _material = new() { };
 
-
-        public IReverter? Reverter => MaterialReverter.Instance;
+        [JsonIgnore] private IReverter? _reverter;
+        [JsonIgnore] public IReverter? Reverter => _reverter ??= new MaterialReverter(this);
         public bool SavesInformation => false;
         public bool VisualizesInformation => true;
 

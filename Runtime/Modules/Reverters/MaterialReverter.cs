@@ -1,51 +1,57 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using KSP.Modules;
+using System.Collections.Generic;
 using UnityEngine;
 using VSwift.Modules.Behaviours;
+using VSwift.Modules.Transformers;
 
 namespace VSwift.Modules.Reverters
 {
     public class MaterialReverter : IReverter
     {
-    
-        private static MaterialReverter? _instance;
-        public static MaterialReverter? Instance => _instance ??= new MaterialReverter();
-    
-        private static void RecursivelyStoreState(GameObject gameObject, Dictionary<Renderer, List<Material>>? state)
+        private readonly MaterialSwapper _swapper;
+
+        public MaterialReverter(MaterialSwapper swapper)
         {
-            var renderers = gameObject.GetComponents<Renderer>();
-            foreach (var renderer in renderers)
-            {
-                state[renderer] = renderer.materials.Select(mat => new Material(mat)).ToList();
-            }
-            foreach (Transform child in gameObject.transform)
-            {
-                var o = child.gameObject;
-                RecursivelyStoreState(o, state);
-            }
+            _swapper = swapper;
         }
 
         public object? Store(Module_PartSwitch partSwitch)
         {
-            Dictionary<Renderer, List<Material>>? dict = new();
-            RecursivelyStoreState(partSwitch.gameObject, dict);
-            return dict;
+            var snapshot = new Dictionary<Material, Material>();
+            CaptureMatching(partSwitch.gameObject, _swapper.Swaps.Keys, snapshot);
+            return snapshot;
         }
 
         public void Revert(Module_PartSwitch partSwitch, object? data, bool isStartingReset)
         {
-            var dict = data as Dictionary<Renderer, List<Material>>;
-            foreach (var (renderer, mats) in dict!)
+            if (data is not Dictionary<Material, Material> snapshot) return;
+            foreach (var (live, original) in snapshot)
             {
-                for (var i = 0; i < renderer.materials.Length; i++)
-                {
-                    renderer.materials[i].CopyPropertiesFromMaterial(mats[i]);
-                }
+                if (live == null) continue;
+                live.CopyPropertiesFromMaterial(original);
             }
             partSwitch.QueueUpdateColors();
         }
 
         public bool RequiresInVariantSet => false;
+
+        private static void CaptureMatching(GameObject root, ICollection<string> targetNames, Dictionary<Material, Material> snapshot)
+        {
+            foreach (var renderer in root.GetComponents<Renderer>())
+            {
+                foreach (var material in renderer.materials)
+                {
+                    if (material == null) continue;
+                    var name = material.name.Replace(" (Clone)", "").Replace(" (Instance)", "");
+                    if (targetNames.Contains(name))
+                    {
+                        snapshot[material] = new Material(material);
+                    }
+                }
+            }
+            foreach (Transform child in root.transform)
+            {
+                CaptureMatching(child.gameObject, targetNames, snapshot);
+            }
+        }
     }
 }

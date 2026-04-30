@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
+using Newtonsoft.Json;
 using VSwift.Modules.Behaviours;
 using VSwift.Modules.Reverters;
 
@@ -10,7 +11,9 @@ namespace VSwift.Modules.Transformers
     {
         [UsedImplicitly]
         public Dictionary<string, Vector3d> MovedNodes = new() { };
-        public IReverter? Reverter => PredefinedNodeReverter.Instance;
+
+        [JsonIgnore] private IReverter? _reverter;
+        [JsonIgnore] public IReverter? Reverter => _reverter ??= new AttachNodeMoveReverter(this);
         public bool SavesInformation => false;
         public bool VisualizesInformation => false;
         public void ApplyInFlight(Module_PartSwitch partSwitch)

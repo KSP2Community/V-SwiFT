@@ -10,6 +10,7 @@ using KSP.Modules;
 using KSP.OAB;
 using KSP.Sim;
 using KSP.Sim.Definitions;
+using KSP.Sim.ResourceSystem;
 using KSP.UI.Binding;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
@@ -300,6 +301,7 @@ namespace VSwift.Modules.Behaviours
         public void ApplyInOab(bool isStarting,VariantSet? swapped=null)
         {
             if (_storedState == null) StoreOriginalState();
+            var savedStoredUnits = SnapshotContainerStoredUnits();
             ResetToOriginalState(isStarting,swapped);
             ApplyCommon();
             var i = 0;
@@ -314,7 +316,40 @@ namespace VSwift.Modules.Behaviours
                     _dataPartSwitch.ActiveVariants[i] == variant.VariantId));
                 i++;
             }
+            RestoreContainerStoredUnits(savedStoredUnits);
             (OABPart as ObjectAssemblyPart)?.UpdateMassValues();
+        }
+
+        private Dictionary<string, double> SnapshotContainerStoredUnits()
+        {
+            var snapshot = new Dictionary<string, double>();
+            if (OABPart is not ObjectAssemblyPart { Containers: { } containers }) return snapshot;
+            var database = GameManager.Instance.Game.ResourceDefinitionDatabase;
+            foreach (var container in containers)
+            {
+                foreach (var resourceID in container)
+                {
+                    snapshot[database.GetDefinitionData(resourceID).name] = container.GetResourceStoredUnits(resourceID);
+                }
+            }
+            return snapshot;
+        }
+
+        private void RestoreContainerStoredUnits(Dictionary<string, double> snapshot)
+        {
+            if (snapshot.Count == 0) return;
+            if (OABPart is not ObjectAssemblyPart { Containers: { } containers }) return;
+            var database = GameManager.Instance.Game.ResourceDefinitionDatabase;
+            foreach (var container in containers)
+            {
+                foreach (var resourceID in container)
+                {
+                    if (snapshot.TryGetValue(database.GetDefinitionData(resourceID).name, out var stored))
+                    {
+                        container.SetResourceStoredUnits(resourceID, stored);
+                    }
+                }
+            }
         }
 
         private void ApplyVariantInOab(Variant variant)
