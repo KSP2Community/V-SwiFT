@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using PatchManager.SassyPatching.Interfaces;
 using VSwift.Attributes;
 
 namespace VSwift.Utilities

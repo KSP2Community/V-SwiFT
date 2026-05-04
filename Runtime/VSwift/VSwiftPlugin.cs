@@ -2,7 +2,6 @@ using System.IO;
 using System.Reflection;
 using JetBrains.Annotations;
 using KSP.Game;
-using PatchManager.SassyPatching.Execution;
 using Redux.ExtraModTypes;
 using SpaceWarp2;
 using SpaceWarp2.API.Mods;
@@ -18,9 +17,6 @@ namespace VSwift
 {
     public class VSwiftPlugin : KerbalMod
     {
-        private const string VSWIFT_MIXINS = 
-            "@mixin ps-pam-override() {\nPAMModuleVisualsOverride +: [\n{\nPartComponentModuleName: PartComponentModule_PartSwitch,\nModuleDisplayName: \"VSwift/PartSwitch\",\nShowHeader: true,\nShowFooter: false\n}\n];}\n@mixin part-switch() {\n+Module_PartSwitch {\n+Data_PartSwitch {\n@mixin-slot\n}\n}\n@include ps-pam-override()\n}";
-            /// Singleton instance of the plugin class
         [PublicAPI] public static VSwiftPlugin Instance { get; set; }
 
         // AppBar button IDs
@@ -36,7 +32,6 @@ namespace VSwift
         {
             IVSwiftLogger.Instance = new VSwiftReduxLogger(SWLogger);
             IVSwiftUI.Instance = new VSwiftUI();
-            Universe.RegisterRawLibrary("VSwift","mixins", VSWIFT_MIXINS);
         }
 
         public override void OnPreInitialized()
