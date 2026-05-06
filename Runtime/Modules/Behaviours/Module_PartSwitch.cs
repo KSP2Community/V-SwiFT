@@ -388,7 +388,7 @@ namespace VSwift.Modules.Behaviours
             foreach (var (instance, data) in _storedState!.OriginalTransformerData)
             {
                 // IVSwiftLogger.Instance.LogInfo($"Reverting {instance} with data {data}");
-                if (!instance.RequiresInVariantSet ||
+                if (!instance.RequiresInVariantSet || isStarting ||
                     (swapped != null && swapped.Variants.Any(x => x.Transformers.Any(y => y.Reverter == instance))))
                     instance.Revert(this, data, isStarting);
             }

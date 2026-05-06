@@ -44,7 +44,7 @@ public class VariantSetsUserData : IndexedListUserData
             VariantSetId = name
         };
         var json = JObject.FromObject(variantSet);
-        var ud = GetFromJToken(json);
+        var ud = Convert(json);
         callback((VariantSetUserData)ud.UserData.Object);
         Append(ud);
     }
