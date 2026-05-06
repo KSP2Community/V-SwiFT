@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using Redux;
 using I2.Loc;
@@ -11,7 +11,7 @@ using VSwift.Modules.Variants;
 namespace VSwift.UI
 {
     /// <summary>
-    /// Controller for the Part Switch Popout Window
+    /// MonoBehaviour controller for the part-switch popout window, rendering the variant list for a single <see cref="VariantSet" /> and applying the player's selection to the underlying <see cref="Module_PartSwitch" />.
     /// </summary>
     public class PartSwitchPopoutWindowController : MonoBehaviour
     {
@@ -33,6 +33,10 @@ namespace VSwift.UI
         }
 
         private bool _isOpen;
+
+        /// <summary>
+        /// Gets or sets whether the popout window is visible.
+        /// </summary>
         public bool IsWindowOpen
         {
             get => _isOpen;
@@ -92,6 +96,11 @@ namespace VSwift.UI
             _variantInformation.Clear();
         }
 
+        /// <summary>
+        /// Opens the popout window for the given part-switch module and variant set.
+        /// </summary>
+        /// <param name="partSwitch">The part-switch module the variant set belongs to.</param>
+        /// <param name="variantSet">The variant set to display.</param>
         public static void ShowFor(Module_PartSwitch partSwitch, VariantSet variantSet) => Instance.ShowForInternal(partSwitch,variantSet);
 
         private int _variantIndex;
@@ -112,8 +121,8 @@ namespace VSwift.UI
         private static readonly LocalizedString UnmetRequirementsLoc = "VSwift/UnmetRequirements";
         private static readonly LocalizedString CurrentlySelectedLoc = "VSwift/CurrentlySelected";
         private static readonly LocalizedString SelectLoc = "VSwift/Select";
-        private const string CheckMark = "\u2713";
-        private const string XMark = "\u00d7";
+        private const string CheckMark = "✓";
+        private const string XMark = "×";
 
         private VisualElement GetButtonForVariant(Variant variant)
         {

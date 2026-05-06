@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -17,29 +17,40 @@ using VSwift.Modules.Reverters;
 namespace VSwift.Modules.Transformers
 {
     /// <summary>
-    /// I will do a custom adapter for this on release to bring it inline with the games resource container stuff
+    /// Adds resource containers to the part when active, persisted across saves and rendered in the variant-info popout.
     /// </summary>
     [Transformer(nameof(ResourceContainerAdder))]
     public class ResourceContainerAdder : ITransformer
     {
+        /// <summary>
+        /// The resource-container definitions to add.
+        /// </summary>
         [UsedImplicitly]
         public List<ContainedResourceDefinition> Containers = new() { };
 
 
+        /// <inheritdoc />
         public IReverter? Reverter => ResourceContainerReverter.Instance;
+
+        /// <inheritdoc />
         public bool SavesInformation => true;
+
+        /// <inheritdoc />
         public bool VisualizesInformation => true;
 
+        /// <inheritdoc />
         public void ApplyInFlight(Module_PartSwitch partSwitch)
         {
             // We really need to do some patching to make sure our module gets initialized *first* at all times
         }
 
+        /// <inheritdoc />
         public (Type savedType, JToken savedValue) SaveInformation()
         {
             return (typeof(ResourceContainerLoader), JToken.Parse(IOProvider.ToJson(Containers)));
         }
 
+        /// <inheritdoc />
         public void ApplyInOab(Module_PartSwitch partSwitch)
         {
             // IVSwiftLogger.Instance.LogInfo(Environment.StackTrace);
@@ -65,6 +76,7 @@ namespace VSwift.Modules.Transformers
             moduleResourceCapacities.Initialize();
         }
 
+        /// <inheritdoc />
         public void ApplyCommon(Module_PartSwitch partSwitch)
         {
         }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Redux;
 using KSP.Game;
@@ -12,6 +12,9 @@ using VSwift.Modules.InformationLoaders;
 
 namespace VSwift.Patches
 {
+    /// <summary>
+    /// Reconstructs a part's <see cref="PartCore" /> with the active variant's transformer outputs applied, used when a saved part is loaded.
+    /// </summary>
     public static class LoadVariantPartData
     {
         private static int Compare(string a, string b) =>
@@ -19,6 +22,12 @@ namespace VSwift.Patches
                 ? aInt.CompareTo(bInt)
                 : string.Compare(a, b, StringComparison.OrdinalIgnoreCase);
 
+        /// <summary>
+        /// Returns the part-core data for the saved part with its stored transformer overrides applied, or the original part-core when no overrides exist.
+        /// </summary>
+        /// <param name="originalPartCore">The base part-core to start from.</param>
+        /// <param name="part">The serialized part carrying the variant overrides.</param>
+        /// <returns>The transformed part-core, cached against <see cref="GameManager" />.<c>Game.Parts</c> by <c>partName+variantName</c>.</returns>
         internal static PartCore GetVariantPartData(PartCore originalPartCore, SerializedPart part)
         {
             if (part.GetPartSwitchOverride() is not { } data)

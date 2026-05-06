@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using UnityEngine;
 using VSwift.Modules.Behaviours;
@@ -7,26 +7,41 @@ using VSwift.Modules.Reverters;
 
 namespace VSwift.Modules.Transformers
 {
+    /// <summary>
+    /// Activates child <see cref="UnityEngine.GameObject" /> transforms on the part by name when active.
+    /// </summary>
     [Transformer(nameof(TransformActivator))]
     public class TransformActivator : ITransformer
     {
+        /// <summary>
+        /// The names of the child transforms to activate.
+        /// </summary>
         public List<string> Transforms = new() { };
 
         [JsonIgnore] private IReverter? _reverter;
+
+        /// <inheritdoc />
         [JsonIgnore] public IReverter? Reverter => _reverter ??= new TransformDeactivator(Transforms);
+
+        /// <inheritdoc />
         public bool SavesInformation => false;
+
+        /// <inheritdoc />
         public bool VisualizesInformation => false;
 
+        /// <inheritdoc />
         public void ApplyInFlight(Module_PartSwitch partSwitch)
         {
             // Do nothing
         }
 
+        /// <inheritdoc />
         public void ApplyInOab(Module_PartSwitch partSwitch)
         {
             // Do nothing
         }
 
+        /// <inheritdoc />
         public void ApplyCommon(Module_PartSwitch partSwitch)
         {
             foreach (var activatedTransform in Transforms)

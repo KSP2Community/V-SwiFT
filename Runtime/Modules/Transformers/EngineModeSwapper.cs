@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using I2.Loc;
@@ -16,19 +16,38 @@ using VSwift.Modules.UI;
 
 namespace VSwift.Modules.Transformers
 {
+    /// <summary>
+    /// Replaces matching engine modes on the part's <c>Module_Engine</c> with the configured modes when active, persists them across saves, and renders their stats in the variant-info popout.
+    /// </summary>
     [Transformer(nameof(EngineModeSwapper))]
     public class EngineModeSwapper : ITransformer
     {
+        /// <summary>
+        /// The engine modes to swap in. Each entry replaces the existing mode whose <c>engineID</c> matches.
+        /// </summary>
         [UsedImplicitly]
         public List<Data_Engine.EngineMode> Modes = new() { };
+
+        /// <summary>
+        /// The transformer instance name; defaults to the <c>EngineModeSwapper</c> short name.
+        /// </summary>
         [UsedImplicitly] public string Name = nameof(EngineModeSwapper);
+
+        /// <inheritdoc />
         public IReverter? Reverter => EngineModesReverter.Instance;
+
+        /// <inheritdoc />
         public bool SavesInformation => true;
+
+        /// <inheritdoc />
         public bool VisualizesInformation => true;
+
+        /// <inheritdoc />
         public void ApplyInFlight(Module_PartSwitch partSwitch)
         {
         }
 
+        /// <inheritdoc />
         public void ApplyInOab(Module_PartSwitch partSwitch)
         {
             if (!partSwitch.OABPart.TryGetModule(out Module_Engine moduleEngine)) return;
@@ -48,10 +67,12 @@ namespace VSwift.Modules.Transformers
             moduleEngine.Initialize();
         }
 
+        /// <inheritdoc />
         public void ApplyCommon(Module_PartSwitch partSwitch)
         {
         }
 
+        /// <inheritdoc />
         public (Type savedType, JToken savedValue) SaveInformation()
         {
             return (typeof(EngineModeSwapLoader), JToken.Parse(IOProvider.ToJson(Modes)));
@@ -59,6 +80,8 @@ namespace VSwift.Modules.Transformers
 
         private const string SingleMode = "SingleMode";
         private const string MultiMode = "MultiMode";
+
+        /// <inheritdoc />
         public VisualElement? VisualizeInformation(Module_PartSwitch modulePartSwitch)
         {
             var database = GameManager.Instance.Game.ResourceDefinitionDatabase;
@@ -66,16 +89,16 @@ namespace VSwift.Modules.Transformers
             var engineModeString = Modes.Count != 1 ? MultiMode : SingleMode;
             foreach (var engineMode in Modes)
             {
-                if (engineMode == null) continue; 
+                if (engineMode == null) continue;
                 LocalizedString displayName = engineMode.EngineDisplayName;
-            
+
                 // First show the propellant name
                 var propellant = engineMode.propellant;
 
                 LocalizedString propName = database
                     .GetDefinitionData(database.GetResourceIDFromName(propellant.mixtureName)).displayNameKey;
                 element.Add(IVSwiftUI.Instance.CreateStatBlock(GetLocalizedStatBlockName("Propellant"), propName));
-            
+
                 // Next show the thrust
                 var vacuumThrust = engineMode.GetThrust(0, 1);
                 var seaLevelThrust = engineMode.GetThrust(1, 1);
@@ -88,7 +111,7 @@ namespace VSwift.Modules.Transformers
                         string.Format(new LocalizedString("VSwift/Thrust/Vacuum"),vacuumThrust.ToString($"N{digitsVacuumThrust}"))
                     )
                 );
-            
+
                 // And finally show the ISP
                 var vacuumIsp = engineMode.atmosphereCurve.Evaluate(0);
                 var seaLevelIsp = engineMode.atmosphereCurve.Evaluate(1);
@@ -101,7 +124,7 @@ namespace VSwift.Modules.Transformers
                         string.Format(new LocalizedString("VSwift/ISP/Vacuum"),vacuumIsp.ToString($"N{digitsVacuumIsp}"))
                     )
                 );
-            
+
                 continue;
                 string GetLocalizedStatBlockName(string key)
                 {

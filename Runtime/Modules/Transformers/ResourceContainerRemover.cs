@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using KSP.Game;
@@ -14,18 +14,32 @@ using VSwift.Modules.Reverters;
 
 namespace VSwift.Modules.Transformers
 {
+    /// <summary>
+    /// Removes resource containers by name from the part when active, persisted across saves.
+    /// </summary>
     [Transformer(nameof(ResourceContainerRemover))]
     public class ResourceContainerRemover : ITransformer
     {
+        /// <summary>
+        /// The resource-container names to remove.
+        /// </summary>
         public List<string> Containers = new() { };
+
+        /// <inheritdoc />
         public IReverter? Reverter => ResourceContainerReverter.Instance;
+
+        /// <inheritdoc />
         public bool SavesInformation => true;
+
+        /// <inheritdoc />
         public bool VisualizesInformation => false;
 
+        /// <inheritdoc />
         public void ApplyInFlight(Module_PartSwitch partSwitch)
         {
         }
 
+        /// <inheritdoc />
         public void ApplyInOab(Module_PartSwitch partSwitch)
         {
             var oabPart = (ObjectAssemblyPart)partSwitch.OABPart;
@@ -67,10 +81,12 @@ namespace VSwift.Modules.Transformers
             moduleResourceCapacities.Initialize();
         }
 
+        /// <inheritdoc />
         public void ApplyCommon(Module_PartSwitch partSwitch)
         {
         }
 
+        /// <inheritdoc />
         public (Type savedType, JToken savedValue) SaveInformation() =>
             (typeof(ResourceContainerRemoveLoader), JToken.FromObject(Containers));
     }

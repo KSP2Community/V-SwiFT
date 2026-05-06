@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using I2.Loc;
 using KSP.Game;
@@ -10,28 +10,40 @@ using VSwift.Modules.UI;
 
 namespace VSwift.Modules.Transformers
 {
+    /// <summary>
+    /// Renders the part's original engine-mode stat blocks (propellant, thrust, ISP) in the variant-info popout without modifying the part.
+    /// </summary>
     [Transformer(nameof(DefaultEngineModesVisualizer))]
     public class DefaultEngineModesVisualizer : ITransformer
     {
+        /// <inheritdoc />
         public IReverter? Reverter => null;
+
+        /// <inheritdoc />
         public bool SavesInformation => false;
+
+        /// <inheritdoc />
         public bool VisualizesInformation => true;
 
+        /// <inheritdoc />
         public void ApplyInFlight(Module_PartSwitch partSwitch)
         {
         }
 
+        /// <inheritdoc />
         public void ApplyInOab(Module_PartSwitch partSwitch)
         {
         }
 
+        /// <inheritdoc />
         public void ApplyCommon(Module_PartSwitch partSwitch)
         {
         }
 
         private const string SingleMode = "SingleMode";
         private const string MultiMode = "MultiMode";
-    
+
+        /// <inheritdoc />
         public VisualElement? VisualizeInformation(Module_PartSwitch modulePartSwitch)
         {
             var database = GameManager.Instance.Game.ResourceDefinitionDatabase;
@@ -44,16 +56,16 @@ namespace VSwift.Modules.Transformers
                 var engineModeString = data!.engineModes.Length != 1 ? MultiMode : SingleMode;
                 foreach (var engineMode in data.engineModes)
                 {
-                    if (engineMode == null) continue; 
+                    if (engineMode == null) continue;
                     LocalizedString displayName = engineMode.EngineDisplayName;
-                
+
                     // First show the propellant name
                     var propellant = engineMode.propellant;
 
                     LocalizedString propName = database
                         .GetDefinitionData(database.GetResourceIDFromName(propellant.mixtureName)).displayNameKey;
                     element.Add(IVSwiftUI.Instance.CreateStatBlock(GetLocalizedStatBlockName("Propellant"), propName));
-                
+
                     // Next show the thrust
                     var vacuumThrust = data.OABGetThrust(engineMode, 0, 1);
                     var seaLevelThrust = data.OABGetThrust(engineMode, 1, 1);
@@ -66,7 +78,7 @@ namespace VSwift.Modules.Transformers
                             string.Format(new LocalizedString("VSwift/Thrust/Vacuum"),vacuumThrust.ToString($"N{digitsVacuumThrust}"))
                         )
                     );
-                
+
                     // And finally show the ISP
                     var vacuumIsp = engineMode.atmosphereCurve.Evaluate(0);
                     var seaLevelIsp = engineMode.atmosphereCurve.Evaluate(1);
@@ -79,7 +91,7 @@ namespace VSwift.Modules.Transformers
                             string.Format(new LocalizedString("VSwift/ISP/Vacuum"),vacuumIsp.ToString($"N{digitsVacuumIsp}"))
                         )
                     );
-                
+
                     continue;
                     string GetLocalizedStatBlockName(string key)
                     {

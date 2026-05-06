@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using VSwift.Modules.Logging;
@@ -6,6 +6,9 @@ using VSwift.Modules.Transformers;
 
 namespace VSwift.Utilities
 {
+    /// <summary>
+    /// Registry mapping <see cref="Modules.Transformers.Transformer" /> attribute names to their concrete transformer types, populated by reflection at static-construction time.
+    /// </summary>
     public static class Transformers
     {
         private static readonly Dictionary<string, Type> TransformerTypes;
@@ -22,6 +25,13 @@ namespace VSwift.Utilities
                 }
             }
         }
+
+        /// <summary>
+        /// Looks up the transformer type registered under the given short name.
+        /// </summary>
+        /// <param name="name">The transformer's short name (the <see cref="Modules.Transformers.Transformer" /> attribute argument).</param>
+        /// <param name="adapterType">The transformer type, or <c>null</c> when no transformer with that name is registered.</param>
+        /// <returns>True if a transformer with that name is registered, false otherwise.</returns>
         internal static bool TryGetTransformerByName(string name, out Type adapterType) =>
             TransformerTypes.TryGetValue(name, out adapterType);
     }

@@ -5,15 +5,23 @@ using VSwift.Modules.Transformers;
 
 namespace VSwift.Modules.Reverters
 {
+    /// <summary>
+    /// Reverts an <see cref="AttachNodeMover" /> by restoring each moved node's original local position.
+    /// </summary>
     public class AttachNodeMoveReverter : IReverter
     {
         private readonly AttachNodeMover _mover;
 
+        /// <summary>
+        /// Creates the reverter for the given <see cref="AttachNodeMover" />.
+        /// </summary>
+        /// <param name="mover">The mover whose nodes are tracked for reversion.</param>
         public AttachNodeMoveReverter(AttachNodeMover mover)
         {
             _mover = mover;
         }
 
+        /// <inheritdoc />
         public object? Store(Module_PartSwitch partSwitch)
         {
             var positions = new Dictionary<string, Vector3>();
@@ -27,6 +35,7 @@ namespace VSwift.Modules.Reverters
             return positions;
         }
 
+        /// <inheritdoc />
         public void Revert(Module_PartSwitch partSwitch, object? data, bool isStartingReset)
         {
             if (isStartingReset) return;
@@ -40,6 +49,7 @@ namespace VSwift.Modules.Reverters
             }
         }
 
+        /// <inheritdoc />
         public bool RequiresInVariantSet => true;
     }
 }

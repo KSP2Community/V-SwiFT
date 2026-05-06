@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using KSP.IO;
 using KSP.Modules;
@@ -9,8 +9,12 @@ using VSwift.Modules.Logging;
 
 namespace VSwift.Modules.InformationLoaders
 {
+    /// <summary>
+    /// Loads <see cref="Transformers.EngineModeSwapper" /> output by replacing matching engine modes on the part's <c>Data_Engine</c> with the saved set.
+    /// </summary>
     public class EngineModeSwapLoader : IInformationLoader
     {
+        /// <inheritdoc />
         public void LoadInformationInto(PartData partData, JToken storedInformation)
         {
             var modes = IOProvider.FromJson<List<Data_Engine.EngineMode>>(storedInformation.ToString(Formatting.None));
@@ -36,7 +40,7 @@ namespace VSwift.Modules.InformationLoaders
                 List<Data_Engine.EngineMode> engineModes = new();
                 foreach (var engineMode in dataEngine.engineModes)
                 {
-                    
+
                     foreach (var engineModeTwo in modes)
                     {
                         if (engineMode.engineID != engineModeTwo.engineID) continue;

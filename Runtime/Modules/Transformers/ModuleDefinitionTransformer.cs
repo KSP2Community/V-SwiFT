@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reflection;
 using JetBrains.Annotations;
 using KSP.IO;
@@ -11,14 +11,24 @@ using VSwift.Modules.Reverters;
 
 namespace VSwift.Modules.Transformers
 {
+    /// <summary>
+    /// Replaces a part module's data with a configured replacement when active, persisted across saves.
+    /// </summary>
     [Transformer(nameof(ModuleDefinitionTransformer))]
     public class ModuleDefinitionTransformer : ITransformer
     {
+        /// <summary>
+        /// The short name of the part-behaviour-module type whose data this transformer replaces.
+        /// </summary>
         [UsedImplicitly]
         public string BehaviourType = "";
 
         [JsonIgnore] private Type? _behaviourType = null;
 
+        /// <summary>
+        /// Gets the resolved <see cref="System.Type" /> for <see cref="BehaviourType" />.
+        /// </summary>
+        /// <exception cref="Exception">Thrown when <see cref="BehaviourType" /> is not a registered component module.</exception>
         [JsonIgnore]
         [PublicAPI]
         public Type ActualBehaviourType
@@ -32,10 +42,17 @@ namespace VSwift.Modules.Transformers
             }
         }
 
+        /// <summary>
+        /// The short name of the module-data type whose value at <see cref="Key" /> is replaced.
+        /// </summary>
         [UsedImplicitly]
         public string DataType = null!;
         [JsonIgnore] private Type? _dataType = null;
 
+        /// <summary>
+        /// Gets the resolved <see cref="System.Type" /> for <see cref="DataType" />.
+        /// </summary>
+        /// <exception cref="Exception">Thrown when <see cref="DataType" /> is not a registered module-data type.</exception>
         [JsonIgnore]
         [PublicAPI]
         public Type ActualDataType
@@ -47,21 +64,35 @@ namespace VSwift.Modules.Transformers
                     : throw new Exception($"Unknown data type: {DataType}");
                 return _dataType;
             }
-        }    
+        }
 
+        /// <summary>
+        /// The field name on the module-data type to replace.
+        /// </summary>
         [UsedImplicitly]
         public string Key = "";
-    
+
+        /// <summary>
+        /// The replacement value to deserialize into the field at <see cref="Key" />.
+        /// </summary>
         [UsedImplicitly]
         public JToken Value = "";
 
+        /// <inheritdoc />
         [JsonIgnore] public IReverter? Reverter => ModuleDefinitionReverter.GetInstanceFor(ActualBehaviourType, ActualDataType, Key);
+
+        /// <inheritdoc />
         public bool SavesInformation => true;
+
+        /// <inheritdoc />
         public bool VisualizesInformation => false;
+
+        /// <inheritdoc />
         public void ApplyInFlight(Module_PartSwitch partSwitch)
         {
         }
 
+        /// <inheritdoc />
         public void ApplyInOab(Module_PartSwitch partSwitch)
         {
             if (!partSwitch.OABPart.TryGetModule(ActualBehaviourType, out var toBeLoaded)) return;
@@ -75,10 +106,12 @@ namespace VSwift.Modules.Transformers
             toBeLoaded.Initialize();
         }
 
+        /// <inheritdoc />
         public void ApplyCommon(Module_PartSwitch partSwitch)
         {
         }
 
+        /// <inheritdoc />
         public (Type savedType, JToken savedValue) SaveInformation()
         {
             return (typeof(ModuleDefinitionLoader), (ActualBehaviourType, ActualDataType, Key, Value).ToJToken());

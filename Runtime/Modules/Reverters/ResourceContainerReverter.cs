@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using KSP.Game;
 using KSP.Modules;
@@ -10,10 +10,19 @@ using VSwift.Modules.Logging;
 
 namespace VSwift.Modules.Reverters
 {
+    /// <summary>
+    /// Reverts a <see cref="Transformers.ResourceContainerAdder" /> or <see cref="Transformers.ResourceContainerRemover" /> by restoring the part's original resource containers.
+    /// </summary>
     public class ResourceContainerReverter : IReverter
     {
         private static ResourceContainerReverter? _instance;
+
+        /// <summary>
+        /// Gets the singleton reverter instance.
+        /// </summary>
         public static ResourceContainerReverter? Instance => _instance ??= new ResourceContainerReverter();
+
+        /// <inheritdoc />
         public object? Store(Module_PartSwitch partSwitch)
         {
             var oabPart = (ObjectAssemblyPart)partSwitch.OABPart;
@@ -23,6 +32,7 @@ namespace VSwift.Modules.Reverters
             return partCore.data.resourceContainers;
         }
 
+        /// <inheritdoc />
         public void Revert(Module_PartSwitch partSwitch, object? data, bool isStartingReset)
         {
             // IVSwiftLogger.Instance.LogInfo("Reverting!!!");
@@ -49,6 +59,7 @@ namespace VSwift.Modules.Reverters
             moduleResourceCapacities.Initialize();
         }
 
+        /// <inheritdoc />
         public bool RequiresInVariantSet => false;
     }
 }

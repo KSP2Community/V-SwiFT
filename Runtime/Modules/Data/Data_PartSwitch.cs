@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Redux;
@@ -13,20 +13,34 @@ using VSwift.Modules.Variants;
 
 namespace VSwift.Modules.Data
 {
+    /// <summary>
+    /// Module-data attached to a part-switch module, carrying the variant sets, the per-set active variant, and the predefined dynamic attach nodes.
+    /// </summary>
     // ReSharper disable once InconsistentNaming
     public class Data_PartSwitch : ModuleData, IMassModifier
     {
+        /// <inheritdoc />
         public override Type ModuleType => typeof(Module_PartSwitch);
 
 
+        /// <summary>
+        /// The variant sets this module data carries.
+        /// </summary>
         [KSPDefinition] public List<VariantSet> VariantSets = new();
 
+        /// <summary>
+        /// The currently-active variant ID per variant set, indexed positionally.
+        /// </summary>
         [KSPState] public List<string> ActiveVariants = new();
 
+        /// <summary>
+        /// Attach nodes whose dynamic state can be toggled by transformers.
+        /// </summary>
         [KSPDefinition] public List<AttachNodeDefinition> PredefinedDynamicNodes = new();
 
         // [KSPState] public List<(string, bool)>? OriginalGameObjectStates = null;
 
+        /// <inheritdoc />
         public override List<OABPartData.PartInfoModuleEntry> GetPartInfoEntries(Type partBehaviourModuleType,
             List<OABPartData.PartInfoModuleEntry> emptyPartInfoEntryList)
         {
@@ -67,6 +81,11 @@ namespace VSwift.Modules.Data
                         new OABPartData.PartInfoModuleSubEntry(LocalizationManager.GetTranslation(GameManager.Instance.Game
                             .ScienceManager.TechNodeDataStore.AvailableData[tech]?.NameLocKey ?? ""))).ToList()
                 );
+
+        /// <summary>
+        /// Returns the per-variant transformer-saved data, indexed by variant-set position and transformer position.
+        /// </summary>
+        /// <returns>The saved data, ready for persistence on the serialized part.</returns>
         public Dictionary<string, Dictionary<string, (string savedType, JToken savedValue)>>? GetStoredVariantInformation()
         {
             var i = 0;
@@ -98,6 +117,9 @@ namespace VSwift.Modules.Data
             return result; // Just make it easier when deserializing
         }
 
+        /// <summary>
+        /// Gets or sets the additional mass contributed by the active variant configuration.
+        /// </summary>
         [KSPState] public float MassModifier { get; set; } = 0;
     }
 }

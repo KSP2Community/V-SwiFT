@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using KSP.Game;
 using KSP.Modules;
@@ -11,25 +11,40 @@ using VSwift.Modules.Reverters;
 
 namespace VSwift.Modules.Transformers
 {
+    /// <summary>
+    /// Swaps materials on the part by mapping each source material name to a replacement loaded from addressables.
+    /// </summary>
     [Transformer(nameof(MaterialSwapper))]
     public class MaterialSwapper : ITransformer
     {
+        /// <summary>
+        /// Map of source material name to the addressables address of the replacement material.
+        /// </summary>
         public Dictionary<string, string> Swaps = new() { };
         [JsonIgnore] private Dictionary<string,Material> _material = new() { };
 
         [JsonIgnore] private IReverter? _reverter;
+
+        /// <inheritdoc />
         [JsonIgnore] public IReverter? Reverter => _reverter ??= new MaterialReverter(CollectAffectedMaterials);
+
+        /// <inheritdoc />
         public bool SavesInformation => false;
+
+        /// <inheritdoc />
         public bool VisualizesInformation => true;
 
+        /// <inheritdoc />
         public void ApplyInFlight(Module_PartSwitch partSwitch)
         {
         }
 
+        /// <inheritdoc />
         public void ApplyInOab(Module_PartSwitch partSwitch)
         {
         }
 
+        /// <inheritdoc />
         public void ApplyCommon(Module_PartSwitch partSwitch)
         {
             // _material ??= LoadMaterial();
@@ -66,7 +81,7 @@ namespace VSwift.Modules.Transformers
                 throw new Exception($"Unknown material {name}");
             }
         }
-    
+
         private void RecursivelySwitch(GameObject gameObject, string name, Material targetMat)
         {
             var renderers = gameObject.GetComponents<Renderer>();

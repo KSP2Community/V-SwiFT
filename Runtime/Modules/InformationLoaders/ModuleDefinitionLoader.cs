@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Reflection;
 using KSP.IO;
@@ -10,8 +10,12 @@ using VSwift.Modules.Logging;
 
 namespace VSwift.Modules.InformationLoaders
 {
+    /// <summary>
+    /// Loads <see cref="Transformers.ModuleDefinitionTransformer" /> output by setting a single field on the named module-data with the saved value.
+    /// </summary>
     public class ModuleDefinitionLoader : IInformationLoader
     {
+        /// <inheritdoc />
         public void LoadInformationInto(PartData partData, JToken storedInformation)
         {
             var (behaviourType, dataType, key, value) =

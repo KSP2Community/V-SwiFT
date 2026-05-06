@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using KSP.Sim.Definitions;
@@ -6,6 +6,9 @@ using KSP.Sim.impl;
 
 namespace VSwift.Modules
 {
+    /// <summary>
+    /// Reflection-based registry of part component modules, data modules, and module-data adapters used by V-SwiFT module-side code.
+    /// </summary>
     public static class ModulesUtilities
     {
         private static Dictionary<string, (Type componentModule, Type behaviour)>? _componentModules;

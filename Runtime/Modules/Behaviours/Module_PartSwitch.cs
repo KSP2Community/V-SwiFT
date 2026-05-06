@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +25,9 @@ using VSwift.Modules.Variants;
 
 namespace VSwift.Modules.Behaviours
 {
+    /// <summary>
+    /// Part-behaviour module that applies the active <see cref="Data_PartSwitch" /> variants to a part, handling OAB UI generation, in-flight application, and per-variant state revert.
+    /// </summary>
     // ReSharper disable once InconsistentNaming
     public class Module_PartSwitch : PartBehaviourModule
     {
@@ -34,11 +37,17 @@ namespace VSwift.Modules.Behaviours
             public readonly Dictionary<IReverter, object?> OriginalTransformerData = new() { };
         }
 
+        /// <inheritdoc />
         public override Type PartComponentModuleType => typeof(PartComponentModule_PartSwitch);
         private Data_PartSwitch? _dataPartSwitch;
         private StoredState? _storedState;
+
+        /// <summary>
+        /// Gets the <see cref="Data_PartSwitch" /> module data this behaviour drives.
+        /// </summary>
         public Data_PartSwitch? DataPartSwitch => _dataPartSwitch;
 
+        /// <inheritdoc />
         protected override void AddDataModules()
         {
             base.AddDataModules();
@@ -46,6 +55,7 @@ namespace VSwift.Modules.Behaviours
             DataModules.TryAddUnique(_dataPartSwitch, out _dataPartSwitch);
         }
 
+        /// <inheritdoc />
         protected override void OnInitialize()
         {
             base.OnInitialize();
@@ -230,6 +240,9 @@ namespace VSwift.Modules.Behaviours
             }
         }
 
+        /// <summary>
+        /// Queues a coroutine that opens the parts manager and scrolls to this part at end-of-frame, used after a variant switch changes the visible PAM rows.
+        /// </summary>
         public void QueuePamUpdate()
         {
             if (gameObject == null || !isActiveAndEnabled || !gameObject.activeInHierarchy)
@@ -254,6 +267,9 @@ namespace VSwift.Modules.Behaviours
             Game.Messages.Publish<PartManagerOpenedMessage>();
         }
 
+        /// <summary>
+        /// Queues a coroutine that refreshes the part's color application after a half-second delay; falls back to immediate refresh when the part is not active.
+        /// </summary>
         public void QueueUpdateColors()
         {
             if (gameObject == null || !isActiveAndEnabled || !gameObject.activeInHierarchy)
@@ -298,6 +314,11 @@ namespace VSwift.Modules.Behaviours
         }
 
 
+        /// <summary>
+        /// Reverts to the original state, then applies every active variant's transformers, used when initializing the OAB part or after a variant swap.
+        /// </summary>
+        /// <param name="isStarting">Whether this is the initial OAB application (true) or a swap (false).</param>
+        /// <param name="swapped">The variant set whose variants were swapped, or <c>null</c> when applying every variant set.</param>
         public void ApplyInOab(bool isStarting,VariantSet? swapped=null)
         {
             if (_storedState == null) StoreOriginalState();
@@ -394,6 +415,7 @@ namespace VSwift.Modules.Behaviours
             return techs.All(tech => scienceManager.IsNodeUnlocked(tech));
         }
 
+        /// <inheritdoc />
         protected override void OnShutdown()
         {
             base.OnShutdown();
@@ -401,6 +423,10 @@ namespace VSwift.Modules.Behaviours
             IsInitialized = false;
         }
 
+        /// <summary>
+        /// Returns the per-variant transformer-saved data from <see cref="DataPartSwitch" />, or <c>null</c> when no module data is attached.
+        /// </summary>
+        /// <returns>The saved data, or <c>null</c>.</returns>
         public Dictionary<string, Dictionary<string, (string savedType, JToken savedValue)>>? GetStoredVariantInformation()
         {
             return _dataPartSwitch?.GetStoredVariantInformation();

@@ -8,6 +8,9 @@ using PatchManager.Parts.UserData;
 
 namespace VSwift;
 
+/// <summary>
+/// Lua module exposed under the global <c>PM.VSwift</c>, providing helpers for attaching V-SwiFT part-switching to parts.
+/// </summary>
 [PatchManagerModule("VSwift")]
 [MoonSharpUserData]
 public class VSwiftLuaModule
@@ -22,6 +25,10 @@ public class VSwiftLuaModule
         _universe = universe;
     }
 
+    /// <summary>
+    /// Adds a PAM module-visuals override on the given part so <see cref="Module_PartSwitch" /> displays under a localized header in the parts manager.
+    /// </summary>
+    /// <param name="part">The part to add the PAM override to.</param>
     public void AddPAMOverride(PartUserData part)
     {
         var asObject = (JObject)part.Token;
@@ -34,6 +41,11 @@ public class VSwiftLuaModule
         });
     }
 
+    /// <summary>
+    /// Adds <see cref="Module_PartSwitch" /> with a <see cref="Data_PartSwitch" /> entry to the given part, runs <paramref name="callback" /> against the new data for further configuration, and applies the PAM module-visuals override.
+    /// </summary>
+    /// <param name="part">The part to receive the part-switch module.</param>
+    /// <param name="callback">Callback that receives the new <see cref="Data_PartSwitch" /> entry for further configuration.</param>
     public void AddPartSwitch(PartUserData part, Action<DynValue> callback)
     {
         part.AddModule("Module_PartSwitch", module =>
