@@ -17,8 +17,8 @@ public class PartSwitchUserData : ExtensibleJsonUserData
     
     public PartSwitchUserData(JToken token) : base(token)
     {
+        _variantSets = MoonSharp.Interpreter.UserData.Create(new VariantSetsUserData((JArray)token["VariantSets"]));
         _predefinedDynamicNodes = MoonSharp.Interpreter.UserData.Create(new NodesUserData((JArray)token["predefinedDynamicNodes"]));
-        
     }
 
     public override IEnumerable<string> GetExtraAndOverriddenKeys()

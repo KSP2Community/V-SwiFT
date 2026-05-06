@@ -13,6 +13,7 @@ public class VariantUserData : ExtensibleJsonUserData
     private DynValue _transformers;
     public VariantUserData(JToken token) : base(token)
     {
+        _transformers = MoonSharp.Interpreter.UserData.Create(new TransformersUserData((JArray)token["Transformers"]));
     }
 
     public override IEnumerable<string> GetExtraAndOverriddenKeys()

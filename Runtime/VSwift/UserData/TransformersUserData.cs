@@ -9,6 +9,7 @@ using VSwift.Utilities;
 
 namespace VSwift.UserData;
 
+[MoonSharpUserData]
 public class TransformersUserData : IndexedListUserData
 {
     public TransformersUserData(JArray token) : base(token)

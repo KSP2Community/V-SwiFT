@@ -8,9 +8,9 @@ namespace VSwift.UserData;
 
 [TransformerAdapter(typeof(EngineModeSwapper))]
 [MoonSharpUserData]
-public class EngineModeUserData : ModesUserData
+public class EngineModeSwapperUserData : ModesUserData
 {
-    public EngineModeUserData(JToken token) : base((JArray)token["Modes"])
+    public EngineModeSwapperUserData(JToken token) : base((JArray)token["Modes"])
     {
     }
 }
