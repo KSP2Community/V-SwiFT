@@ -29,5 +29,13 @@ namespace VSwift.Modules.Reverters
         /// Gets whether this reverter only runs when at least one transformer in the swapping variant set references it (true), or runs unconditionally on every swap (false).
         /// </summary>
         public bool RequiresInVariantSet { get; }
+
+        /// <summary>
+        /// Gets whether this reverter is safe and necessary to run during in-flight initialization.
+        /// </summary>
+        /// <remarks>
+        /// In flight, the part prefab loads fresh, so transformers whose effects are persisted via <see cref="Transformers.ITransformer.SaveInformation" /> do not need their reverters re-run. Reverters that operate on the live <see cref="UnityEngine.GameObject" /> (transform activation, material state) must run in flight to undo prefab-default state that conflicts with the active variant. True if the reverter operates on prefab-loaded GameObject state and must fire during flight init, false otherwise.
+        /// </remarks>
+        public bool AppliesInFlight { get; }
     }
 }

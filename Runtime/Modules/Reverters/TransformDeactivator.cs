@@ -41,5 +41,8 @@ namespace VSwift.Modules.Reverters
 
         /// <inheritdoc />
         public bool RequiresInVariantSet => true;
+
+        /// <inheritdoc />
+        public bool AppliesInFlight => true;
     }
 }

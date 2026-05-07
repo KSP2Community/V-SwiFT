@@ -220,6 +220,7 @@ namespace VSwift.Modules.Behaviours
 
         private void ApplyInFlight()
         {
+            ResetFlightVisualState();
             ApplyCommon();
             var i = 0;
             foreach (var variantSet in _dataPartSwitch!.VariantSets)
@@ -237,6 +238,28 @@ namespace VSwift.Modules.Behaviours
                 ApplyVariantInFlight(variantSet.Variants.First(variant =>
                     _dataPartSwitch.ActiveVariants[i] == variant.VariantId));
                 i++;
+            }
+        }
+
+        private void ResetFlightVisualState()
+        {
+            if (_storedState == null)
+            {
+                _storedState = new StoredState();
+                var transformers = _dataPartSwitch!.VariantSets
+                    .SelectMany(variantSet => variantSet.Variants)
+                    .SelectMany(variant => variant.Transformers)
+                    .Where(transformer => transformer.Reverter is { AppliesInFlight: true }
+                        && !_storedState.OriginalTransformerData.ContainsKey(transformer.Reverter));
+                foreach (var transformer in transformers)
+                {
+                    var reverter = transformer.Reverter!;
+                    _storedState.OriginalTransformerData[reverter] = reverter.Store(this);
+                }
+            }
+            foreach (var (instance, data) in _storedState.OriginalTransformerData)
+            {
+                instance.Revert(this, data, true);
             }
         }
 
@@ -397,11 +420,12 @@ namespace VSwift.Modules.Behaviours
         private void StoreOriginalState()
         {
             _storedState = new StoredState();
-            foreach (var transformer in from variantSet in _dataPartSwitch!.VariantSets
-                     from variant in variantSet.Variants
-                     from transformer in variant.Transformers
-                     where transformer.Reverter != null && !_storedState.OriginalTransformerData.ContainsKey(transformer.Reverter)
-                     select transformer)
+            var transformers = _dataPartSwitch!.VariantSets
+                .SelectMany(variantSet => variantSet.Variants)
+                .SelectMany(variant => variant.Transformers)
+                .Where(transformer => transformer.Reverter != null
+                    && !_storedState.OriginalTransformerData.ContainsKey(transformer.Reverter));
+            foreach (var transformer in transformers)
             {
                 var reverter = transformer.Reverter;
                 _storedState.OriginalTransformerData[reverter!] = reverter!.Store(this);
