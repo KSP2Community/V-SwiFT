@@ -48,6 +48,11 @@ namespace VSwift.Modules.Transformers
                 {
                     partSwitch.OABPart.SetNodeLocalPosition(node, definition.position);
                     partSwitch.OABPart.SetNodeLocalScale(node, definition.size);
+                    if (node is ObjectAssemblyPartNode oabNode)
+                    {
+                        oabNode.SizeKey = PartSizeRegistry.GetAttachNodeSizeKey(definition);
+                        oabNode.Diameter = PartSizeRegistry.GetAttachNodeDiameter(definition);
+                    }
                 }
                 else
                 {
@@ -59,7 +64,8 @@ namespace VSwift.Modules.Transformers
                             null,
                             definition.size,
                             AttachNodeType.Stack,
-                            true));
+                            true,
+                            definition.sizeKey));
                 }
             }
         }

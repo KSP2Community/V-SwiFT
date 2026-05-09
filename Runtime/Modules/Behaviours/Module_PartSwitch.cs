@@ -78,7 +78,8 @@ namespace VSwift.Modules.Behaviours
                     null,
                     predefinedNode.size,
                     AttachNodeType.Stack,
-                    true
+                    true,
+                    predefinedNode.sizeKey
                 ));
             }
             ApplyInOab(true);
