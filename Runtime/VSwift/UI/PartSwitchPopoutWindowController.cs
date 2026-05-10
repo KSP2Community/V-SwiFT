@@ -110,8 +110,7 @@ namespace VSwift.UI
             get => _currentPartSwitchModule!.DataPartSwitch!.ActiveVariants[_variantIndex];
             set
             {
-                _currentPartSwitchModule!.DataPartSwitch!.ActiveVariants[_variantIndex] = value;
-                _currentPartSwitchModule.ApplyInOab(false,_currentPartSwitchModule!.DataPartSwitch!.VariantSets[_variantIndex]);
+                _currentPartSwitchModule!.SelectVariantInOab(_variantIndex, value);
             }
         }
 

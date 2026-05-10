@@ -10,16 +10,13 @@ using KSP.Modules;
 using KSP.OAB;
 using KSP.Sim;
 using KSP.Sim.Definitions;
-using KSP.Sim.ResourceSystem;
 using KSP.UI.Binding;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 using VSwift.Modules.Components;
 using VSwift.Modules.Data;
-using VSwift.Modules.Extensions;
 using VSwift.Modules.Logging;
 using VSwift.Modules.Reverters;
-using VSwift.Modules.Transformers;
 using VSwift.Modules.UI;
 using VSwift.Modules.Variants;
 
@@ -87,15 +84,7 @@ namespace VSwift.Modules.Behaviours
 
         private int HandleVariantSetInOab(int j, VariantSet variantSet)
         {
-            if (_dataPartSwitch!.ActiveVariants.Count <= j)
-            {
-                _dataPartSwitch.ActiveVariants.Add(variantSet.Variants.First().VariantId);
-            }
-
-            if (variantSet.Variants.All(v => _dataPartSwitch.ActiveVariants[j] != v.VariantId))
-            {
-                _dataPartSwitch.ActiveVariants[j] = variantSet.Variants.First().VariantId;
-            }
+            EnsureActiveVariant(j, variantSet);
 
             if (variantSet.IsPopout)
             {
@@ -144,9 +133,7 @@ namespace VSwift.Modules.Behaviours
                 IVSwiftLogger.Instance.LogInfo($"{OABPart.Name} switched variant to {newVariant}");
                 try
                 {
-                    _dataPartSwitch.ActiveVariants[j] = newVariant;
-                    ApplyInOab(false,variantSet);
-                    QueuePamUpdate();
+                    SelectVariantInOab(j, newVariant);
                 }
                 catch (Exception e)
                 {
@@ -172,17 +159,9 @@ namespace VSwift.Modules.Behaviours
         private void HandleInFlightInitialization()
         {
             var i = 0;
-            foreach (var variant in _dataPartSwitch!.VariantSets)
+            foreach (var variantSet in _dataPartSwitch!.VariantSets)
             {
-                if (_dataPartSwitch!.ActiveVariants.Count <= i)
-                {
-                    _dataPartSwitch.ActiveVariants.Add(variant.Variants.First().VariantId);
-                }
-
-                if (variant.Variants.All(v => _dataPartSwitch.ActiveVariants[i] != v.VariantId))
-                {
-                    _dataPartSwitch.ActiveVariants[i] = variant.Variants.First().VariantId;
-                }
+                EnsureActiveVariant(i, variantSet);
 
                 i += 1;
             }
@@ -195,15 +174,7 @@ namespace VSwift.Modules.Behaviours
             var i = 0;
             foreach (var variantSet in _dataPartSwitch!.VariantSets)
             {
-                if (_dataPartSwitch.ActiveVariants.Count <= i)
-                {
-                    _dataPartSwitch.ActiveVariants.Add(variantSet.Variants.First().VariantId);
-                }
-
-                if (variantSet.Variants.All(variant => _dataPartSwitch.ActiveVariants[i] != variant.VariantId))
-                {
-                    _dataPartSwitch.ActiveVariants[i] = variantSet.Variants.First().VariantId;
-                }
+                EnsureActiveVariant(i, variantSet);
 
                 ApplyVariantCommon(variantSet.Variants.First(variant =>
                     _dataPartSwitch.ActiveVariants[i] == variant.VariantId));
@@ -226,15 +197,7 @@ namespace VSwift.Modules.Behaviours
             var i = 0;
             foreach (var variantSet in _dataPartSwitch!.VariantSets)
             {
-                if (_dataPartSwitch.ActiveVariants.Count <= i)
-                {
-                    _dataPartSwitch.ActiveVariants.Add(variantSet.Variants.First().VariantId);
-                }
-
-                if (variantSet.Variants.All(variant => _dataPartSwitch.ActiveVariants[i] != variant.VariantId))
-                {
-                    _dataPartSwitch.ActiveVariants[i] = variantSet.Variants.First().VariantId;
-                }
+                EnsureActiveVariant(i, variantSet);
 
                 ApplyVariantInFlight(variantSet.Variants.First(variant =>
                     _dataPartSwitch.ActiveVariants[i] == variant.VariantId));
@@ -352,10 +315,7 @@ namespace VSwift.Modules.Behaviours
             var i = 0;
             foreach (var variantSet in _dataPartSwitch!.VariantSets)
             {
-                if (_dataPartSwitch.ActiveVariants.Count <= i)
-                {
-                    _dataPartSwitch.ActiveVariants.Add(variantSet.Variants.First().VariantId);
-                }
+                EnsureActiveVariant(i, variantSet);
 
                 ApplyVariantInOab(variantSet.Variants.First(variant =>
                     _dataPartSwitch.ActiveVariants[i] == variant.VariantId));
@@ -403,6 +363,99 @@ namespace VSwift.Modules.Behaviours
             {
                 transformer.ApplyInOab(this);
             }
+        }
+
+        /// <summary>
+        /// Selects a variant in OAB and records the selection as a builder edit.
+        /// </summary>
+        public void SelectVariantInOab(int variantSetIndex, string variantId)
+        {
+            if (_dataPartSwitch == null ||
+                variantSetIndex < 0 ||
+                variantSetIndex >= _dataPartSwitch.VariantSets.Count)
+            {
+                return;
+            }
+
+            VariantSet variantSet = _dataPartSwitch.VariantSets[variantSetIndex];
+            if (variantSet.Variants.All(variant => variant.VariantId != variantId))
+            {
+                return;
+            }
+
+            EnsureActiveVariant(variantSetIndex, variantSet);
+            _dataPartSwitch.ActiveVariants[variantSetIndex] = variantId;
+            ApplyInOab(false, variantSet);
+            ApplySelectionToSymmetrySet(variantSetIndex, variantId);
+            QueuePamUpdate();
+            MarkOabDirty();
+        }
+
+        private void ApplySelectionToSymmetrySet(int variantSetIndex, string variantId)
+        {
+            if (OABPart?.SymmetrySet?.Parts == null)
+            {
+                return;
+            }
+
+            foreach (IObjectAssemblyPart symmetryPart in OABPart.SymmetrySet.Parts)
+            {
+                if (ReferenceEquals(symmetryPart, OABPart) ||
+                    !symmetryPart.TryGetModule(out Module_PartSwitch partSwitch) ||
+                    partSwitch.DataPartSwitch == null ||
+                    variantSetIndex < 0 ||
+                    variantSetIndex >= partSwitch.DataPartSwitch.VariantSets.Count)
+                {
+                    continue;
+                }
+
+                VariantSet symmetryVariantSet = partSwitch.DataPartSwitch.VariantSets[variantSetIndex];
+                if (symmetryVariantSet.Variants.All(variant => variant.VariantId != variantId))
+                {
+                    continue;
+                }
+
+                partSwitch.EnsureActiveVariant(variantSetIndex, symmetryVariantSet);
+                partSwitch.DataPartSwitch.ActiveVariants[variantSetIndex] = variantId;
+                partSwitch.ApplyInOab(false, symmetryVariantSet);
+            }
+        }
+
+        private string EnsureActiveVariant(int index, VariantSet variantSet)
+        {
+            string defaultVariant = GetDefaultVariant(index, variantSet);
+            while (_dataPartSwitch!.ActiveVariants.Count <= index)
+            {
+                _dataPartSwitch.ActiveVariants.Add(defaultVariant);
+            }
+
+            if (variantSet.Variants.All(variant => _dataPartSwitch.ActiveVariants[index] != variant.VariantId))
+            {
+                _dataPartSwitch.ActiveVariants[index] = defaultVariant;
+            }
+
+            return _dataPartSwitch.ActiveVariants[index];
+        }
+
+        private string GetDefaultVariant(int index, VariantSet variantSet)
+        {
+            if (_dataPartSwitch!.DefaultActiveVariants.Count > index)
+            {
+                string defaultVariant = _dataPartSwitch.DefaultActiveVariants[index];
+                if (variantSet.Variants.Any(variant => variant.VariantId == defaultVariant))
+                {
+                    return defaultVariant;
+                }
+            }
+
+            return variantSet.Variants.First().VariantId;
+        }
+
+        private void MarkOabDirty()
+        {
+            ObjectAssemblyBuilder currentBuilder = Game.OAB?.Current;
+            currentBuilder?.eventsBuilder.OnDirtyingAction?.Invoke(OABActionType.Other);
+            currentBuilder?.eventsBuilder.OnInternalRefresh?.Invoke();
         }
 
         private void ResetToOriginalState(bool isStarting=false,VariantSet? swapped=null)

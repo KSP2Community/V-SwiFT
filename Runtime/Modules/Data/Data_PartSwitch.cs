@@ -7,7 +7,6 @@ using KSP.Game;
 using KSP.Sim;
 using KSP.Sim.Definitions;
 using Newtonsoft.Json.Linq;
-using UnityEngine.Serialization;
 using VSwift.Modules.Behaviours;
 using VSwift.Modules.Variants;
 
@@ -34,11 +33,29 @@ namespace VSwift.Modules.Data
         [KSPState] public List<string> ActiveVariants = new();
 
         /// <summary>
+        /// The definition-side default variant ID per variant set, indexed positionally.
+        /// </summary>
+        [KSPDefinition] public List<string> DefaultActiveVariants = new();
+
+        /// <summary>
         /// Attach nodes whose dynamic state can be toggled by transformers.
         /// </summary>
         [KSPDefinition] public List<AttachNodeDefinition> PredefinedDynamicNodes = new();
 
         // [KSPState] public List<(string, bool)>? OriginalGameObjectStates = null;
+
+        /// <inheritdoc />
+        public override void SyncAllSymmetricalData(ModuleData sourceModuleData)
+        {
+            base.SyncAllSymmetricalData(sourceModuleData);
+            if (sourceModuleData is not Data_PartSwitch source)
+            {
+                return;
+            }
+
+            ActiveVariants = new List<string>(source.ActiveVariants);
+            MassModifier = source.MassModifier;
+        }
 
         /// <inheritdoc />
         public override List<OABPartData.PartInfoModuleEntry> GetPartInfoEntries(Type partBehaviourModuleType,
