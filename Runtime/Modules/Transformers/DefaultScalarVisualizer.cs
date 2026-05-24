@@ -1,4 +1,6 @@
+using System;
 using JetBrains.Annotations;
+using UnityEngine;
 using UnityEngine.UIElements;
 using VSwift.Modules.Behaviours;
 using VSwift.Modules.Extensions;
@@ -10,12 +12,16 @@ namespace VSwift.Modules.Transformers
     /// <summary>
     /// Renders the value at the configured key on the part data as a stat block in the variant-info popout without modifying the part.
     /// </summary>
+    [Serializable]
     [Transformer(nameof(DefaultScalarVisualizer))]
+    [TransformerCategory("Visualizers")]
+    [TransformerDescription("Show a part-data value in the variant popout")]
     public class DefaultScalarVisualizer : ITransformer
     {
         /// <summary>
         /// The key to read from the part data.
         /// </summary>
+        [Tooltip("Key path on the part data whose value is rendered as a stat block in the variant info popout.")]
         [UsedImplicitly]
         public string Key = "";
 

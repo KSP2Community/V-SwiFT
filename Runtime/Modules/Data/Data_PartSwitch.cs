@@ -16,6 +16,7 @@ namespace VSwift.Modules.Data
     /// Module-data attached to a part-switch module, carrying the variant sets, the per-set active variant, and the predefined dynamic attach nodes.
     /// </summary>
     // ReSharper disable once InconsistentNaming
+    [Serializable]
     public class Data_PartSwitch : ModuleData, IMassModifier
     {
         /// <inheritdoc />

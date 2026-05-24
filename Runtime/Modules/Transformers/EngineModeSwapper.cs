@@ -7,6 +7,7 @@ using KSP.Game;
 using KSP.IO;
 using KSP.Modules;
 using Newtonsoft.Json.Linq;
+using UnityEngine;
 using UnityEngine.UIElements;
 using VSwift.Modules.Behaviours;
 using VSwift.Modules.Extensions;
@@ -19,18 +20,23 @@ namespace VSwift.Modules.Transformers
     /// <summary>
     /// Replaces matching engine modes on the part's <c>Module_Engine</c> with the configured modes when active, persists them across saves, and renders their stats in the variant-info popout.
     /// </summary>
+    [Serializable]
     [Transformer(nameof(EngineModeSwapper))]
+    [TransformerCategory("Module surgery")]
+    [TransformerDescription("Replace engine modes")]
     public class EngineModeSwapper : ITransformer
     {
         /// <summary>
         /// The engine modes to swap in. Each entry replaces the existing mode whose <c>engineID</c> matches.
         /// </summary>
+        [Tooltip("Engine modes that replace the engine's existing modes when this variant is active.")]
         [UsedImplicitly]
         public List<Data_Engine.EngineMode> Modes = new() { };
 
         /// <summary>
-        /// The transformer instance name; defaults to the <c>EngineModeSwapper</c> short name.
+        /// The transformer instance name. Defaults to the <c>EngineModeSwapper</c> short name.
         /// </summary>
+        [Tooltip("Identifier for this engine-mode swap. Defaults to the transformer's short name.")]
         [UsedImplicitly] public string Name = nameof(EngineModeSwapper);
 
         /// <inheritdoc />

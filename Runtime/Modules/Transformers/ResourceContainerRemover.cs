@@ -7,6 +7,7 @@ using KSP.Modules;
 using KSP.OAB;
 using KSP.Sim.ResourceSystem;
 using Newtonsoft.Json.Linq;
+using UnityEngine;
 using VSwift.Modules.Behaviours;
 using VSwift.Modules.InformationLoaders;
 using VSwift.Modules.Logging;
@@ -17,12 +18,16 @@ namespace VSwift.Modules.Transformers
     /// <summary>
     /// Removes resource containers by name from the part when active, persisted across saves.
     /// </summary>
+    [Serializable]
     [Transformer(nameof(ResourceContainerRemover))]
+    [TransformerCategory("Resources")]
+    [TransformerDescription("Remove containers")]
     public class ResourceContainerRemover : ITransformer
     {
         /// <summary>
         /// The resource-container names to remove.
         /// </summary>
+        [Tooltip("Names of resource containers to remove from the part when this variant is active.")]
         public List<string> Containers = new() { };
 
         /// <inheritdoc />

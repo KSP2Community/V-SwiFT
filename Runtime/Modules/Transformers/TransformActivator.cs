@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -10,12 +11,16 @@ namespace VSwift.Modules.Transformers
     /// <summary>
     /// Activates child <see cref="UnityEngine.GameObject" /> transforms on the part by name when active.
     /// </summary>
+    [Serializable]
     [Transformer(nameof(TransformActivator))]
+    [TransformerCategory("Visual")]
+    [TransformerDescription("Enable/disable GameObjects")]
     public class TransformActivator : ITransformer
     {
         /// <summary>
         /// The names of the child transforms to activate.
         /// </summary>
+        [Tooltip("GameObject paths under the part to activate when this variant is selected. Resolved via FindChildRecursive.")]
         public List<string> Transforms = new() { };
 
         [JsonIgnore] private IReverter? _reverter;

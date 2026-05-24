@@ -1,6 +1,8 @@
 using System;
 using I2.Loc;
 using JetBrains.Annotations;
+using Redux.Modules.Attributes;
+using UnityEngine;
 using UnityEngine.UIElements;
 using VSwift.Modules.Behaviours;
 using VSwift.Modules.Reverters;
@@ -11,12 +13,17 @@ namespace VSwift.Modules.Transformers
     /// <summary>
     /// Adds a fixed value to the part's <see cref="Data.Data_PartSwitch.MassModifier" /> when active.
     /// </summary>
+    [Serializable]
     [Transformer(nameof(MassModifier))]
+    [TransformerCategory("Mass & Physics")]
+    [TransformerDescription("Adjust part mass by delta")]
     public class MassModifier : ITransformer
     {
         /// <summary>
         /// The mass delta added to the part when this transformer is active.
         /// </summary>
+        [Tooltip("Value added to the part's mass when this variant is active, in tonnes. Can be negative.")]
+        [Unit("t")]
         [UsedImplicitly]
         public float Modifier = 0.0f;
 

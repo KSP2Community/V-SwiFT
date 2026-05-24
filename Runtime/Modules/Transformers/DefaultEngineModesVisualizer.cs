@@ -13,7 +13,10 @@ namespace VSwift.Modules.Transformers
     /// <summary>
     /// Renders the part's original engine-mode stat blocks (propellant, thrust, ISP) in the variant-info popout without modifying the part.
     /// </summary>
+    [Serializable]
     [Transformer(nameof(DefaultEngineModesVisualizer))]
+    [TransformerCategory("Visualizers")]
+    [TransformerDescription("Show engine mode stats in the variant popout")]
     public class DefaultEngineModesVisualizer : ITransformer
     {
         /// <inheritdoc />

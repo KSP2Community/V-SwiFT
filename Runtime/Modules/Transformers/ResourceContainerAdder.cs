@@ -19,12 +19,16 @@ namespace VSwift.Modules.Transformers
     /// <summary>
     /// Adds resource containers to the part when active, persisted across saves and rendered in the variant-info popout.
     /// </summary>
+    [Serializable]
     [Transformer(nameof(ResourceContainerAdder))]
+    [TransformerCategory("Resources")]
+    [TransformerDescription("Add containers")]
     public class ResourceContainerAdder : ITransformer
     {
         /// <summary>
         /// The resource-container definitions to add.
         /// </summary>
+        [Tooltip("Resource containers to add to the part when this variant is active.")]
         [UsedImplicitly]
         public List<ContainedResourceDefinition> Containers = new() { };
 

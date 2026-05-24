@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -15,12 +16,16 @@ namespace VSwift.Modules.Transformers
     /// <summary>
     /// Adds attach nodes to the part (or repositions existing nodes whose tag matches a configured node) when active.
     /// </summary>
+    [Serializable]
     [Transformer(nameof(AttachNodeAdder))]
+    [TransformerCategory("Attach nodes")]
+    [TransformerDescription("Add nodes when active")]
     public class AttachNodeAdder : ITransformer
     {
         /// <summary>
         /// The attach-node definitions to add or reposition.
         /// </summary>
+        [Tooltip("Attach nodes to add to the part, or to reposition if a node with the matching ID already exists, when this variant is active.")]
         [UsedImplicitly] public List<AttachNodeDefinition> Nodes = new() { };
 
         [JsonIgnore] private IReverter? _reverter;

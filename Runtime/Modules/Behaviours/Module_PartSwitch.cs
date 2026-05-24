@@ -36,7 +36,7 @@ namespace VSwift.Modules.Behaviours
 
         /// <inheritdoc />
         public override Type PartComponentModuleType => typeof(PartComponentModule_PartSwitch);
-        private Data_PartSwitch? _dataPartSwitch;
+        [SerializeField] private Data_PartSwitch? _dataPartSwitch;
         private StoredState? _storedState;
 
         /// <summary>

@@ -10,7 +10,10 @@ namespace VSwift.Modules.Transformers
     /// <summary>
     /// Renders the part's original mass as a stat block in the variant-info popout without modifying the part.
     /// </summary>
+    [Serializable]
     [Transformer(nameof(DefaultMassVisualizer))]
+    [TransformerCategory("Visualizers")]
+    [TransformerDescription("Show part mass in the variant popout")]
     public class DefaultMassVisualizer : ITransformer
     {
         /// <inheritdoc />

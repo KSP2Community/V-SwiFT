@@ -4,6 +4,7 @@ using JetBrains.Annotations;
 using KSP.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using UnityEngine;
 using VSwift.Modules.Behaviours;
 using VSwift.Modules.Extensions;
 using VSwift.Modules.InformationLoaders;
@@ -14,12 +15,16 @@ namespace VSwift.Modules.Transformers
     /// <summary>
     /// Replaces a part module's data with a configured replacement when active, persisted across saves.
     /// </summary>
+    [Serializable]
     [Transformer(nameof(ModuleDefinitionTransformer))]
+    [TransformerCategory("Module surgery")]
+    [TransformerDescription("Swap a Data_<X> module")]
     public class ModuleDefinitionTransformer : ITransformer
     {
         /// <summary>
         /// The short name of the part-behaviour-module type whose data this transformer replaces.
         /// </summary>
+        [Tooltip("Short type name of the part behaviour module to override (e.g. Module_Engine).")]
         [UsedImplicitly]
         public string BehaviourType = "";
 
@@ -45,6 +50,7 @@ namespace VSwift.Modules.Transformers
         /// <summary>
         /// The short name of the module-data type whose value at <see cref="Key" /> is replaced.
         /// </summary>
+        [Tooltip("Short type name of the module data to swap in (e.g. Data_Engine).")]
         [UsedImplicitly]
         public string DataType = null!;
         [JsonIgnore] private Type? _dataType = null;
@@ -69,6 +75,7 @@ namespace VSwift.Modules.Transformers
         /// <summary>
         /// The field name on the module-data type to replace.
         /// </summary>
+        [Tooltip("Name of the field on the module data type whose value is replaced.")]
         [UsedImplicitly]
         public string Key = "";
 

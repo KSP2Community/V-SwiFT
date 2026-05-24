@@ -1,22 +1,29 @@
+using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
+using UnityEngine;
 using VSwift.Modules.Behaviours;
 using VSwift.Modules.Reverters;
+using VSwift.Utilities;
 
 namespace VSwift.Modules.Transformers
 {
     /// <summary>
     /// Repositions existing attach nodes on the part to the configured local positions when active.
     /// </summary>
+    [Serializable]
     [Transformer(nameof(AttachNodeMover))]
+    [TransformerCategory("Attach nodes")]
+    [TransformerDescription("Move existing nodes")]
     public class AttachNodeMover : ITransformer
     {
         /// <summary>
         /// Map of node ID to the new local position to move it to.
         /// </summary>
+        [Tooltip("Map from existing node ID to the new local position to move it to.")]
         [UsedImplicitly]
-        public Dictionary<string, Vector3d> MovedNodes = new() { };
+        public SerializedDictionary<string, Vector3d> MovedNodes = new() { };
 
         [JsonIgnore] private IReverter? _reverter;
 

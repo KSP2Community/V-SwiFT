@@ -8,19 +8,24 @@ using UnityEngine.AddressableAssets;
 using VSwift.Modules.Behaviours;
 using VSwift.Modules.Logging;
 using VSwift.Modules.Reverters;
+using VSwift.Utilities;
 
 namespace VSwift.Modules.Transformers
 {
     /// <summary>
     /// Swaps materials on the part by mapping each source material name to a replacement loaded from addressables.
     /// </summary>
+    [Serializable]
     [Transformer(nameof(MaterialSwapper))]
+    [TransformerCategory("Visual")]
+    [TransformerDescription("Swap materials by name")]
     public class MaterialSwapper : ITransformer
     {
         /// <summary>
         /// Map of source material name to the addressables address of the replacement material.
         /// </summary>
-        public Dictionary<string, string> Swaps = new() { };
+        [Tooltip("Map from a material name on the part to the addressables key of its replacement material.")]
+        public SerializedDictionary<string, string> Swaps = new() { };
         [JsonIgnore] private Dictionary<string,Material> _material = new() { };
 
         [JsonIgnore] private IReverter? _reverter;
