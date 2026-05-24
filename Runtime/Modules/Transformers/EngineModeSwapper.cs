@@ -22,7 +22,7 @@ namespace VSwift.Modules.Transformers
     /// </summary>
     [Serializable]
     [Transformer(nameof(EngineModeSwapper))]
-    [TransformerCategory("Module surgery")]
+    [TransformerCategory("Module Overrides")]
     [TransformerDescription("Replace engine modes")]
     public class EngineModeSwapper : ITransformer
     {

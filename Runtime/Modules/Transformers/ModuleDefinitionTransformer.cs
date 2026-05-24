@@ -17,9 +17,9 @@ namespace VSwift.Modules.Transformers
     /// </summary>
     [Serializable]
     [Transformer(nameof(ModuleDefinitionTransformer))]
-    [TransformerCategory("Module surgery")]
+    [TransformerCategory("Module Overrides")]
     [TransformerDescription("Swap a Data_<X> module")]
-    public class ModuleDefinitionTransformer : ITransformer
+    public class ModuleDefinitionTransformer : ITransformer, ISerializationCallbackReceiver
     {
         /// <summary>
         /// The short name of the part-behaviour-module type whose data this transformer replaces.
@@ -85,6 +85,39 @@ namespace VSwift.Modules.Transformers
         [UsedImplicitly]
         public JToken Value = "";
 
+        [SerializeField, JsonIgnore]
+        private string _valueSerialized = "";
+
+        /// <summary>
+        /// Flushes <see cref="Value" /> to a string so Unity's serializer can persist it. JToken itself is invisible to Unity but the string round-trips through prefab YAML.
+        /// </summary>
+        public void OnBeforeSerialize()
+        {
+            _valueSerialized = Value?.ToString(Formatting.None) ?? string.Empty;
+        }
+
+        /// <summary>
+        /// Restores <see cref="Value" /> from the persisted string. Empty or malformed input yields a null JToken with a console warning.
+        /// </summary>
+        public void OnAfterDeserialize()
+        {
+            if (string.IsNullOrEmpty(_valueSerialized))
+            {
+                Value = null;
+                return;
+            }
+            try
+            {
+                Value = JToken.Parse(_valueSerialized);
+            }
+            catch (System.Exception e)
+            {
+                UnityEngine.Debug.LogWarning(
+                    $"[ModuleDefinitionTransformer] Failed to parse stored value '{_valueSerialized}': {e.Message}");
+                Value = null;
+            }
+        }
+
         /// <inheritdoc />
         [JsonIgnore] public IReverter? Reverter => ModuleDefinitionReverter.GetInstanceFor(ActualBehaviourType, ActualDataType, Key);
 
@@ -104,7 +137,7 @@ namespace VSwift.Modules.Transformers
         {
             if (!partSwitch.OABPart.TryGetModule(ActualBehaviourType, out var toBeLoaded)) return;
             toBeLoaded.Shutdown();
-            if (toBeLoaded.DataModules.TryGetValue(ActualDataType, out var moduleData)) return;
+            if (!toBeLoaded.DataModules.TryGetValue(ActualDataType, out var moduleData)) return;
             var field = moduleData.GetType()
                 .GetField(Key, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             if (field == null) return;
