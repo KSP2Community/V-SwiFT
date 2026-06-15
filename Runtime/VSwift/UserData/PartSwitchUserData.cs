@@ -84,7 +84,7 @@ public class PartSwitchUserData : ExtensibleJsonUserData
     public void PatchVariantSet(string name, Action<VariantSetUserData> callback)
     {
         var wrapper = (VariantSetsUserData)_variantSets.UserData.Object;
-        var entry = wrapper[name];
+        var entry = wrapper.LuaGet(DynValue.NewString(name));
         if (entry.Type != DataType.Nil)
         {
             callback((VariantSetUserData)entry.UserData.Object);
