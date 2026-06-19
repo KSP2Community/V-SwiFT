@@ -25,6 +25,12 @@ namespace VSwift
         /// </summary>
         [PublicAPI] public static VSwiftPlugin Instance { get; set; }
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetStatics()
+        {
+            Instance = null;
+        }
+
         // AppBar button IDs
         internal const string ToolbarFlightButtonID = "BTN-VSwiftFlight";
         internal const string ToolbarOabButtonID = "BTN-VSwiftOAB";

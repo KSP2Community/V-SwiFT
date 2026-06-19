@@ -12,6 +12,12 @@ namespace VSwift.Utilities
     {
         private static Dictionary<Type, Type> _transformerAdapters;
 
+        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetStatics()
+        {
+            _transformerAdapters = new Dictionary<Type, Type> { };
+        }
+
         static Adapters()
         {
             _transformerAdapters = new Dictionary<Type, Type> { };

@@ -15,6 +15,12 @@ namespace VSwift.Modules.Reverters
     {
         private static EngineModesReverter? _instance;
 
+        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetStatics()
+        {
+            _instance = null;
+        }
+
         /// <summary>
         /// Gets the singleton reverter instance.
         /// </summary>

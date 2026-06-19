@@ -14,6 +14,12 @@ namespace VSwift.UI
     /// </summary>
     public class VSwiftUI : IVSwiftUI
     {
+        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetStatics()
+        {
+            StatBlockContainer = null;
+        }
+
         /// <inheritdoc />
         public void ShowUIFor(Module_PartSwitch modulePartSwitch, VariantSet variantSet)
         {

@@ -13,6 +13,13 @@ namespace VSwift.Modules
     {
         private static Dictionary<string, (Type componentModule, Type behaviour)>? _componentModules;
 
+        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetStatics()
+        {
+            _componentModules = null;
+            _dataModules = null;
+        }
+
         private static void BuildComponentModuleDictionary()
         {
             _componentModules = new();

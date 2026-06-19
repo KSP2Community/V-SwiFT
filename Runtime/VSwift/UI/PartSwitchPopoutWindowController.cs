@@ -16,6 +16,15 @@ namespace VSwift.UI
     public class PartSwitchPopoutWindowController : MonoBehaviour
     {
         private static PartSwitchPopoutWindowController Instance;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetStatics()
+        {
+            Instance = null;
+            VariantNameContainer = null;
+            RequirementContainer = null;
+        }
+
         private UIDocument _window;
         private VisualElement _rootElement;
         private Module_PartSwitch _currentPartSwitchModule;
