@@ -56,7 +56,7 @@ public class VariantSetsUserData : IndexedListUserData
     /// <param name="callback">Callback that receives the variant set for further configuration.</param>
     public void Ensure(string name, Action<VariantSetUserData> callback)
     {
-        var existing = this[name];
+        var existing = LuaGet(DynValue.NewString(name));
         if (existing.Type != DataType.Nil)
         {
             callback((VariantSetUserData)existing.UserData.Object);
