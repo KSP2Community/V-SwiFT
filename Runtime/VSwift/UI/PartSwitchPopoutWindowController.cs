@@ -3,6 +3,7 @@ using System.Linq;
 using Redux;
 using I2.Loc;
 using KSP.Game;
+using UitkForKsp2.API;
 using UnityEngine;
 using UnityEngine.UIElements;
 using VSwift.Modules.Behaviours;
@@ -25,7 +26,7 @@ namespace VSwift.UI
             RequirementContainer = null;
         }
 
-        private UIDocument _window;
+        private PanelRenderer _window;
         private VisualElement _rootElement;
         private Module_PartSwitch _currentPartSwitchModule;
         // private VariantSet _currentVariantSet;
@@ -82,21 +83,24 @@ namespace VSwift.UI
         /// </summary>
         private void OnEnable()
         {
-            // Get the UIDocument component from the game object
-            _window = GetComponent<UIDocument>();
+            // Get the PanelRenderer component from the game object
+            _window = GetComponent<PanelRenderer>();
 
             // Get the root element of the window.
             // Since we're cloning the UXML tree from a VisualTreeAsset, the actual root element is a TemplateContainer,
             // so we need to get the first child of the TemplateContainer to get our actual root VisualElement.
-            _rootElement = _window.rootVisualElement.Q<VisualElement>("window");
-            _closeButton = _rootElement.Q<Button>("close-button");
-            _closeButton.clicked += () => IsWindowOpen = false;
-            _titleLabel = _rootElement.Q<Label>("part-name");
-            _variantSelect = _rootElement.Q<ScrollView>("variant-select");
-            _variantInformation = _rootElement.Q<ScrollView>("variant-information");
-            _selectVariant = _rootElement.Q<Button>("select-variant");
-            ResetWindow();
-            IsWindowOpen = false;
+            _window.OnPanelRoot(panelRoot =>
+            {
+                _rootElement = panelRoot.Q<VisualElement>("window");
+                _closeButton = _rootElement.Q<Button>("close-button");
+                _closeButton.clicked += () => IsWindowOpen = false;
+                _titleLabel = _rootElement.Q<Label>("part-name");
+                _variantSelect = _rootElement.Q<ScrollView>("variant-select");
+                _variantInformation = _rootElement.Q<ScrollView>("variant-information");
+                _selectVariant = _rootElement.Q<Button>("select-variant");
+                ResetWindow();
+                IsWindowOpen = false;
+            });
         }
 
         private void ResetWindow()
