@@ -46,15 +46,15 @@ namespace VSwift.Modules.Reverters
             var resourceContainers = (List<ContainedResourceDefinition>)data;
             if (resourceContainers is { Count: > 0 })
             {
-                var list = new List<IResourceContainer>();
-                foreach (var resourceContainer in resourceContainers.Select(containedResourceDefinition =>
-                             new ResourceContainer(GameManager.Instance.Game.ResourceDefinitionDatabase, containedResourceDefinition)))
-                {
-                    // IVSwiftLogger.Instance.LogInfo($"ResetToOriginalState adding {resourceContainer.First()}");
-                    resourceContainer.FreezeDefinitions();
-                    list.Add(resourceContainer);
-                }
-                oabPart.Containers = list.ToArray();
+                var resourceContainer = new ResourceContainer(
+                    GameManager.Instance.Game.ResourceDefinitionDatabase,
+                    resourceContainers);
+                resourceContainer.FreezeDefinitions();
+                oabPart.Container = resourceContainer;
+            }
+            else
+            {
+                oabPart.Container = null;
             }
 
             if (!oabPart.TryGetModule(typeof(Module_ResourceCapacities), out var module)) return;

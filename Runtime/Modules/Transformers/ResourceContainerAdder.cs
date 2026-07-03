@@ -62,15 +62,22 @@ namespace VSwift.Modules.Transformers
             var resourceContainers = Containers;
             if (resourceContainers is { Count: > 0 })
             {
-                var list = oabPart.Containers.ToList();
-                foreach (var resourceContainer in resourceContainers.Select(containedResourceDefinition =>
-                             new ResourceContainer(GameManager.Instance.Game.ResourceDefinitionDatabase, containedResourceDefinition)))
+                var database = GameManager.Instance.Game.ResourceDefinitionDatabase;
+                var definitions = new List<ContainedResourceDefinition>();
+                if (oabPart.Container is ResourceContainer existing)
                 {
-                    // IVSwiftLogger.Instance.LogInfo($"ApplyInOab adding {resourceContainer.First()}");
-                    resourceContainer.FreezeDefinitions();
-                    list.Add(resourceContainer);
+                    for (int i = 0; i < existing.ResourceIDMap.Count; i++)
+                    {
+                        definitions.Add(new ContainedResourceDefinition(
+                            existing.GetResourceContainedData(existing.ResourceIDMap[i]),
+                            database));
+                    }
                 }
-                oabPart.Containers = list.ToArray();
+
+                definitions.AddRange(resourceContainers);
+                var resourceContainer = new ResourceContainer(database, definitions);
+                resourceContainer.FreezeDefinitions();
+                oabPart.Container = resourceContainer;
             }
             if (!oabPart.TryGetModule(typeof(Module_ResourceCapacities), out var module)) return;
             var moduleResourceCapacities = (Module_ResourceCapacities)module;

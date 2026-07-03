@@ -328,14 +328,11 @@ namespace VSwift.Modules.Behaviours
         private Dictionary<string, double> SnapshotContainerStoredUnits()
         {
             var snapshot = new Dictionary<string, double>();
-            if (OABPart is not ObjectAssemblyPart { Containers: { } containers }) return snapshot;
+            if (OABPart is not ObjectAssemblyPart { Container: { } container }) return snapshot;
             var database = GameManager.Instance.Game.ResourceDefinitionDatabase;
-            foreach (var container in containers)
+            foreach (var resourceID in container)
             {
-                foreach (var resourceID in container)
-                {
-                    snapshot[database.GetDefinitionData(resourceID).name] = container.GetResourceStoredUnits(resourceID);
-                }
+                snapshot[database.GetDefinitionData(resourceID).name] = container.GetResourceStoredUnits(resourceID);
             }
             return snapshot;
         }
@@ -343,16 +340,13 @@ namespace VSwift.Modules.Behaviours
         private void RestoreContainerStoredUnits(Dictionary<string, double> snapshot)
         {
             if (snapshot.Count == 0) return;
-            if (OABPart is not ObjectAssemblyPart { Containers: { } containers }) return;
+            if (OABPart is not ObjectAssemblyPart { Container: { } container }) return;
             var database = GameManager.Instance.Game.ResourceDefinitionDatabase;
-            foreach (var container in containers)
+            foreach (var resourceID in container)
             {
-                foreach (var resourceID in container)
+                if (snapshot.TryGetValue(database.GetDefinitionData(resourceID).name, out var stored))
                 {
-                    if (snapshot.TryGetValue(database.GetDefinitionData(resourceID).name, out var stored))
-                    {
-                        container.SetResourceStoredUnits(resourceID, stored);
-                    }
+                    container.SetResourceStoredUnits(resourceID, stored);
                 }
             }
         }
