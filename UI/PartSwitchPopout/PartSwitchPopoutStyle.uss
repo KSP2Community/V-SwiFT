@@ -9,7 +9,7 @@
 }
 
 .part-switch-title > .unity-label {
-    -unity-font-definition: var(--font-title-small);
+    -unity-font-definition: url("project://database/Packages/uitkforksp2.controls/Assets/Theme/Fonts/SFPixelate/pixelate%20SDF.asset?fileID=11400000&guid=b04efd89de5b82b47829ada6e728086c&type=2#pixelate SDF");
     font-size: 16px;
     -unity-text-align: middle-left;
     padding: 0;
@@ -17,7 +17,7 @@
 }
 
 .part-switch-title > .unity-button {
-    -unity-font-definition: var(--font-title-big);
+    -unity-font-definition: url("project://database/Packages/uitkforksp2.controls/Assets/Theme/Fonts/LEDCounter7/led_counter-7%20SDF.asset?fileID=11400000&guid=33e1e97b69ec355479ba49006381fc06&type=2#led_counter-7 SDF");
     background-color: rgba(15, 19, 24, 0);
     font-size: 24px;
     color: rgba(192, 199, 213, 0.75);
@@ -116,7 +116,7 @@
 }
 
 .variant-stat-title {
-    -unity-font-definition: var(--font-title-small);
+    -unity-font-definition: url("project://database/Packages/uitkforksp2.controls/Assets/Theme/Fonts/SFPixelate/pixelate%20SDF.asset?fileID=11400000&guid=b04efd89de5b82b47829ada6e728086c&type=2#pixelate SDF");
     background-color: rgba(127, 127, 255, 0.05);
     padding-top: 6px;
     padding-left: 4px;
@@ -125,7 +125,7 @@
 
 .variant-stat-info {
     white-space: normal;
-    -unity-font-definition: var(--font-regular);
+    -unity-font-definition: url("project://database/Packages/uitkforksp2.controls/Assets/Theme/Fonts/JetBrainsMono/JetBrainsMono-Regular%20SDF.asset?fileID=11400000&guid=f5454c9c675002c44a5a7234bd40c390&type=2#JetBrainsMono-Regular SDF");
     padding-left: 4px;
 }
 
