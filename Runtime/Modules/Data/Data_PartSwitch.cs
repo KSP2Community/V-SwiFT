@@ -7,6 +7,8 @@ using KSP.Game;
 using KSP.Sim;
 using KSP.Sim.Definitions;
 using Newtonsoft.Json.Linq;
+using Redux.Ecs.Components;
+using Unity.Entities;
 using VSwift.Modules.Behaviours;
 using VSwift.Modules.Variants;
 
@@ -17,7 +19,7 @@ namespace VSwift.Modules.Data
     /// </summary>
     // ReSharper disable once InconsistentNaming
     [Serializable]
-    public class Data_PartSwitch : ModuleData, IMassModifier
+    public class Data_PartSwitch : ModuleData
     {
         /// <inheritdoc />
         public override Type ModuleType => typeof(Module_PartSwitch);
@@ -138,6 +140,42 @@ namespace VSwift.Modules.Data
         /// <summary>
         /// Gets or sets the additional mass contributed by the active variant configuration.
         /// </summary>
-        [KSPState] public float MassModifier { get; set; } = 0;
+        [KSPState]
+        public float MassModifier
+        {
+            get => Entity == Entity.Null
+                ? _massModifier
+                : (float)World.DefaultGameObjectInjectionWorld.EntityManager
+                    .GetComponentData<MassModifierData>(Entity).Value;
+            set
+            {
+                if (Entity == Entity.Null)
+                {
+                    _massModifier = value;
+                    return;
+                }
+
+                World.DefaultGameObjectInjectionWorld.EntityManager
+                    .SetComponentData(Entity, new MassModifierData { Value = value });
+            }
+        }
+
+        private float _massModifier;
+        
+        public override void BindToEntity(EntityManager em, Entity entity)
+        {
+            base.BindToEntity(em, entity);
+            em.SetComponentData(entity, new MassModifierData { Value = _massModifier });
+        }
+
+        /// <inheritdoc />
+        public override void UnbindFromEntity()
+        {
+            EntityManager em = World.DefaultGameObjectInjectionWorld.EntityManager;
+            if (Entity != Entity.Null && em.Exists(Entity))
+                _massModifier = (float)em.GetComponentData<MassModifierData>(Entity).Value;
+
+            base.UnbindFromEntity();
+        }
     }
 }
