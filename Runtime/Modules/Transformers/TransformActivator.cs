@@ -51,7 +51,7 @@ namespace VSwift.Modules.Transformers
         {
             foreach (var activatedTransform in Transforms)
             {
-                var t = partSwitch.gameObject.transform.FindChildRecursive(activatedTransform);
+                var t = partSwitch.gameObject.transform.Find(activatedTransform);
                 if (ReferenceEquals(t,null) || t == null)
                 {
                     IVSwiftLogger.Instance.LogError($"Could not find child of {partSwitch.gameObject.name} with name {activatedTransform}");
