@@ -29,7 +29,7 @@ namespace VSwift.Modules.Reverters
         {
             foreach (var transformName in _transforms)
             {
-                var t = partSwitch.gameObject.transform.FindChildRecursive(transformName);
+                var t = partSwitch.gameObject.transform.Find(transformName);
                 if (ReferenceEquals(t, null) || t == null)
                 {
                     IVSwiftLogger.Instance?.LogError($"Could not find child of {partSwitch.gameObject.name} with name {transformName}");
