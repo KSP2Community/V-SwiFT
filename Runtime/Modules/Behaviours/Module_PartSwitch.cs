@@ -144,12 +144,19 @@ namespace VSwift.Modules.Behaviours
             foreach (var variant in variantSet.Variants)
             {
                 if (!AreAllTechsUnlocked(variant.VariantTechs)) continue;
+
+                string localizationKey = string.IsNullOrEmpty(variant.VariantLocalizationKey)
+                    ? variant.VariantId
+                    : variant.VariantLocalizationKey;
+                string translatedText = LocalizationManager.GetTranslation(localizationKey);
+                string text = string.IsNullOrEmpty(translatedText)
+                    ? variant.VariantId
+                    : translatedText;
+
                 list.Add(variant.VariantId, new DropdownItem
                 {
                     key = variant.VariantId,
-                    text = LocalizationManager.GetTranslation(variant.VariantLocalizationKey.IsNullOrEmpty()
-                        ? variant.VariantId
-                        : variant.VariantLocalizationKey)
+                    text = text
                 });
             }
 
